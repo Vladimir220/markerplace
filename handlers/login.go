@@ -13,6 +13,7 @@ type user struct {
 }
 
 func (h Handlers) Login(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 	if r.Method != http.MethodPost {
 		http.Error(w, "expected POST", http.StatusMethodNotAllowed)
 		return
@@ -49,4 +50,5 @@ func (h Handlers) Login(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 		Expires:  time.Now().Add(256),
 	})
+
 }

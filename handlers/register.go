@@ -8,6 +8,7 @@ import (
 )
 
 func (h Handlers) Register(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 	if r.Method != http.MethodPost {
 		http.Error(w, "expected POST", http.StatusMethodNotAllowed)
 		return
