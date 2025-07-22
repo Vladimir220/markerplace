@@ -12,7 +12,7 @@ func (md MarcketplaceDAO) GetUser(login string) (user models.User, password stri
 		return
 	}
 
-	queryStr := "SELECT login, group, password FROM users WHERE login=$1;"
+	queryStr := "SELECT login, group_name, password FROM users WHERE login=$1;"
 
 	connection := md.сonnectionPool.GetConnection()
 

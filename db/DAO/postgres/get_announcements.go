@@ -49,7 +49,7 @@ func (md MarcketplaceDAO) GetAnnouncements(orderType *string, minPrice, maxPrice
 	offset := fmt.Sprintf("OFFSET %d", (page-1)*pageSize)
 	limit := fmt.Sprintf("LIMIT %d", page*pageSize)
 
-	queryStr := fmt.Sprintf("SELECT title, body, pic-link, price, date, author FROM announcements %s %s %s %s;", filter, order, offset, limit)
+	queryStr := fmt.Sprintf("SELECT title, body, pic_link, price, date, author_login, id FROM announcements %s %s %s %s;", filter, order, offset, limit)
 
 	connection := md.сonnectionPool.GetConnection()
 
@@ -62,7 +62,7 @@ func (md MarcketplaceDAO) GetAnnouncements(orderType *string, minPrice, maxPrice
 
 	for rows.Next() {
 		announcement := models.ExtendedAnnouncement{}
-		err = rows.Scan(&announcement.An.Title, &announcement.An.Body, &announcement.An.PicLink, &announcement.An.Price, &announcement.Date, &announcement.AuthorLogin)
+		err = rows.Scan(&announcement.An.Title, &announcement.An.Body, &announcement.An.PicLink, &announcement.An.Price, &announcement.Date, &announcement.AuthorLogin, &announcement.Id)
 		if err != nil {
 			err = fmt.Errorf("MarcketplaceDAO:GetUser: %v", err)
 			return

@@ -12,9 +12,9 @@ func (md MarcketplaceDAO) Registr(login, password string) (user models.User, err
 		return
 	}
 
-	queryStr := `INSERT INTO users (login, group, password) 
+	queryStr := `INSERT INTO users (login, group_name, password) 
 				VALUES ($1, 'user', $2)
-				RETURNING login, group;`
+				RETURNING login, group_name;`
 
 	connection := md.сonnectionPool.GetConnection()
 

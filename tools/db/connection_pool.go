@@ -5,8 +5,14 @@ import (
 	"fmt"
 	"main/tools/log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"sync"
+
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+	_ "github.com/lib/pq"
 )
 
 type IConnectionPool interface {
@@ -42,6 +48,8 @@ func CreateConnectionPool() IConnectionPool {
 			connectionPool.c = append(connectionPool.c, connection)
 			connectionPool.currNum++
 			isActiveDB = true
+		} else {
+			connectionPool.logger.WriteError(fmt.Sprintf("GetConnection(): %v", err))
 		}
 	}
 	if !isActiveDB {
@@ -49,6 +57,7 @@ func CreateConnectionPool() IConnectionPool {
 		return nil
 	}
 
+	connectionPool.checkMigrations()
 	return connectionPool
 }
 
@@ -64,7 +73,7 @@ func (conn *ConnectionPool) GetConnection() *sql.DB {
 	defer conn.mux.Unlock()
 	n := len(conn.c)
 
-	if conn.c == nil || n == 0 {
+	if n == 0 {
 		conn.logger.WriteError("GetConnection(): no connections left")
 		return nil
 	}
@@ -115,4 +124,36 @@ func (conn *ConnectionPool) Close() {
 	}
 	conn.num = 0
 	conn.currNum = 0
+}
+
+func (conn *ConnectionPool) checkMigrations() {
+	if len(conn.c) == 0 {
+		conn.logger.WriteError("checkMigrations(): no connections left")
+		return
+	}
+
+	driver, err := postgres.WithInstance(conn.c[0], &postgres.Config{})
+	if err != nil {
+		conn.logger.WriteError(fmt.Sprintf("checkMigrations(): %v", err))
+		return
+	}
+
+	dbName := os.Getenv("DB_NAME")
+	var path string
+	currentDir, _ := os.Getwd()
+	path = filepath.ToSlash(currentDir)
+	if path != "" {
+		path = path + "/"
+	}
+
+	m, err := migrate.NewWithDatabaseInstance("file://"+path+"db/migrations", dbName, driver)
+	if err != nil {
+		conn.logger.WriteError(fmt.Sprintf("checkMigrations(): %v", err))
+		return
+	}
+
+	if err = m.Up(); err != nil && err != migrate.ErrNoChange {
+		conn.logger.WriteError(fmt.Sprintf("checkMigrations(): %v", err))
+		return
+	}
 }

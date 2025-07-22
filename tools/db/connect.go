@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
+
+	_ "github.com/lib/pq"
 )
 
 func connect() (db *sql.DB, err error) {
@@ -35,7 +37,7 @@ func connect() (db *sql.DB, err error) {
 	}
 
 	if !isDbExist {
-		_, err = tempConn.Exec("CREATE DATABASE $1;", dbName)
+		_, err = tempConn.Exec(fmt.Sprintf("CREATE DATABASE %s;", dbName))
 		if err != nil {
 			return
 		}

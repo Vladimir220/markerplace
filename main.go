@@ -7,9 +7,15 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
+
 	host := os.Getenv("HOST")
 	if host == "" {
 		panic("following variables is not specified in env: NUM_OF_DB_CONNECTIONS")

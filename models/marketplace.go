@@ -15,6 +15,7 @@ type Announcement struct {
 
 type ExtendedAnnouncement struct {
 	An          Announcement `json:"announcement"`
+	Id          uint         `json:"id"`
 	AuthorLogin string       `json:"author-login"`
 	Date        time.Time    `json:"date"`
 	Yours       bool         `json:"yours"`
