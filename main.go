@@ -1,16 +1,9 @@
 package main
 
-import (
-	"main/handlers"
-	"main/network/middleware"
-	"net/http"
-	"os"
-
-	"github.com/gorilla/mux"
-)
+import "fmt"
 
 func main() {
-	host := os.Getenv("HOST")
+	/*host := os.Getenv("HOST")
 	if host == "" {
 		panic("following variables is not specified in env: NUM_OF_DB_CONNECTIONS")
 	}
@@ -27,6 +20,7 @@ func main() {
 	authMiddleware := middleware.CreateAuthorizationMiddleware()
 	authMiddleware.SetNext(routerPaths)
 
-	http.ListenAndServe(host, authMiddleware)
-
+	http.ListenAndServe(host, authMiddleware)*/
+	var ss uint
+	fmt.Print(ss - 1)
 }

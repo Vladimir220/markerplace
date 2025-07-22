@@ -39,39 +39,26 @@ func (h Handlers) Announcements(w http.ResponseWriter, r *http.Request) {
 		*maxPrice = uint(maxPrice64)
 	}
 
-	offsetStr := r.URL.Query().Get("offset")
-	var offset uint
-	if offsetStr != "" {
-		offset = 0
+	pageStr := r.URL.Query().Get("page")
+	var page uint
+	if pageStr != "" {
+		page = 0
 	} else {
-		offset64, err := strconv.ParseUint(offsetStr, 10, 64)
+		page64, err := strconv.ParseUint(pageStr, 10, 64)
 		if err != nil {
-			http.Error(w, "offset requires uint", http.StatusBadRequest)
+			http.Error(w, "page requires uint", http.StatusBadRequest)
 			return
 		}
-		offset = uint(offset64)
+		page = uint(page64)
 	}
 
-	limitStr := r.URL.Query().Get("limit")
-	var limit uint
-	if limitStr != "" {
-		limit = 10
-	} else {
-		limit64, err := strconv.ParseUint(limitStr, 10, 64)
-		if err != nil {
-			http.Error(w, "limit requires uint", http.StatusBadRequest)
-			return
-		}
-		limit = uint(limit64)
-	}
-
-	announcement, err := h.dao.GetAnnouncements(orderType, minPrice, maxPrice, offset, limit)
+	announcements, err := h.dao.GetAnnouncements(orderType, minPrice, maxPrice, page)
 	if err != nil {
 		http.Error(w, "server error", http.StatusInternalServerError)
 		return
 	}
 
-	res, _ := json.Marshal(announcement)
+	res, _ := json.Marshal(announcements)
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(res))

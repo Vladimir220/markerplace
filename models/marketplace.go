@@ -21,9 +21,9 @@ type ExtendedAnnouncement struct {
 }
 
 type Announcements struct {
-	Ans         []Announcement `json:"announcements"`
-	Page        uint           `json:"page"`
-	MaxPage     uint           `json:"maxPage"`
-	MinPrice    uint           `json:"minPrice"`
-	PriceFilter bool           `json:"priceFilter"`
+	Ans         []ExtendedAnnouncement `json:"announcements"`
+	Page        uint                   `json:"page"`
+	MaxPage     uint                   `json:"maxPage"`
+	MinPrice    uint                   `json:"minPrice"`
+	PriceFilter bool                   `json:"priceFilter"`
 }

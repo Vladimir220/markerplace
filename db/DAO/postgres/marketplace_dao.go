@@ -6,7 +6,7 @@ import (
 )
 
 type IMarcketplaceDAO interface {
-	GetAnnouncements(orderType *string, minPrice, maxPrice *uint, offset, limit uint) (announcement models.ExtendedAnnouncement, err error)
+	GetAnnouncements(orderType *string, minPrice, maxPrice *uint, page uint) (announcement models.Announcements, err error)
 	GetUser(login string) (user models.User, password string, isFound bool, err error)
 	NewAnnouncement(announcement models.ExtendedAnnouncement) (resAnnouncement models.ExtendedAnnouncement, err error)
 	Registr(login, password string) (user models.User, err error)

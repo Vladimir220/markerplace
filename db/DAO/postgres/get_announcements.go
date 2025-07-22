@@ -5,14 +5,24 @@ import (
 	"main/models"
 )
 
-func (md MarcketplaceDAO) GetAnnouncements(orderType *string, minPrice, maxPrice *uint, offset, limit uint) (announcement models.ExtendedAnnouncement, err error) {
+const pageSize = 10
+
+func (md MarcketplaceDAO) GetAnnouncements(orderType *string, minPrice, maxPrice *uint, page uint) (announcements models.Announcements, err error) {
+	announcements.Ans = make([]models.ExtendedAnnouncement, pageSize)
+	announcements.PriceFilter = true
 	var filter string
 	if maxPrice != nil && minPrice != nil {
 		filter = fmt.Sprintf("WHERE price >= %d AND price < %d", *minPrice, *maxPrice)
+		announcements.MaxPage = *maxPrice
+		announcements.MinPrice = *minPrice
 	} else if maxPrice != nil {
 		filter = fmt.Sprintf("WHERE price < %d", *maxPrice)
+		announcements.MaxPage = *maxPrice
 	} else if minPrice != nil {
 		filter = fmt.Sprintf("WHERE price >= %d", *minPrice)
+		announcements.MinPrice = *minPrice
+	} else {
+		announcements.PriceFilter = false
 	}
 
 	order := "ORDER BY "
@@ -33,14 +43,31 @@ func (md MarcketplaceDAO) GetAnnouncements(orderType *string, minPrice, maxPrice
 		order = fmt.Sprintf("%s date ASC", order)
 	}
 
-	queryStr := fmt.Sprintf("SELECT title, body, pic-link, price, date, author FROM announcements %s %s;", filter, order)
+	if page == 0 {
+		page = 1
+	}
+	offset := fmt.Sprintf("OFFSET %d", (page-1)*pageSize)
+	limit := fmt.Sprintf("LIMIT %d", page*pageSize)
+
+	queryStr := fmt.Sprintf("SELECT title, body, pic-link, price, date, author FROM announcements %s %s %s %s;", filter, order, offset, limit)
 
 	connection := md.сonnectionPool.GetConnection()
 
-	err = connection.QueryRow(queryStr).Scan(&announcement.An.Title, &announcement.An.Body, &announcement.An.PicLink, &announcement.An.Price, &announcement.Date, &announcement.AuthorLogin)
+	rows, err := connection.Query(queryStr)
 	if err != nil {
 		err = fmt.Errorf("MarcketplaceDAO:GetUser: %v", err)
 		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		announcement := models.ExtendedAnnouncement{}
+		err = rows.Scan(&announcement.An.Title, &announcement.An.Body, &announcement.An.PicLink, &announcement.An.Price, &announcement.Date, &announcement.AuthorLogin)
+		if err != nil {
+			err = fmt.Errorf("MarcketplaceDAO:GetUser: %v", err)
+			return
+		}
+		announcements.Ans = append(announcements.Ans, announcement)
 	}
 
 	return
