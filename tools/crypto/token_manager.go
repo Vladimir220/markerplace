@@ -52,7 +52,7 @@ func (tm *TokenManager) GenerateToken(user models.User) (token string, err error
 
 	tokenJWT := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	token, err = tokenJWT.SignedString(defaultSigningKey)
+	token, err = tokenJWT.SignedString([]byte(defaultSigningKey))
 	if err != nil {
 		err = fmt.Errorf("TokenManager:GenerateToken(): %v", err)
 		return

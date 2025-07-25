@@ -31,5 +31,4 @@ func (h Handlers) NewAnnouncement(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "server error", http.StatusInternalServerError)
 		return
 	}
-
 }

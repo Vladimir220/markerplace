@@ -22,5 +22,6 @@ func (md MarcketplaceDAO) GetUser(login string) (user models.User, password stri
 		return
 	}
 
+	isFound = true
 	return
 }

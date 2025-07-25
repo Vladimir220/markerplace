@@ -50,5 +50,4 @@ func (h Handlers) Login(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 		Expires:  time.Now().Add(256),
 	})
-
 }
