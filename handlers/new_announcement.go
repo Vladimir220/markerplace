@@ -3,7 +3,9 @@ package handlers
 import (
 	"encoding/json"
 	"main/models"
+	"main/tools/auth"
 	"net/http"
+	"time"
 )
 
 func (h Handlers) NewAnnouncement(w http.ResponseWriter, r *http.Request) {
@@ -26,6 +28,14 @@ func (h Handlers) NewAnnouncement(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user, ok := auth.CheckAuth(r.Context())
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	announcement.AuthorLogin = user.Login
+	announcement.Date = time.Now()
 	_, err = h.dao.NewAnnouncement(announcement)
 	if err != nil {
 		http.Error(w, "server error", http.StatusInternalServerError)

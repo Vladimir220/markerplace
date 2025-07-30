@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	ta "main/tools/auth"
 	"net/http"
 	"strconv"
 )
@@ -56,6 +57,18 @@ func (h Handlers) Announcements(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "server error", http.StatusInternalServerError)
 		return
+	}
+
+	user, ok := ta.CheckAuth(r.Context())
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	for i, a := range announcements.Ans {
+		if user.Login == a.AuthorLogin {
+			announcements.Ans[i].Yours = true
+		}
 	}
 
 	res, _ := json.Marshal(announcements)
