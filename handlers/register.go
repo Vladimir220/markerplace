@@ -35,6 +35,7 @@ func (h Handlers) Register(w http.ResponseWriter, r *http.Request) {
 	a := auth.CreateAuthentication()
 	token, err := a.Register(user.Login, user.Password)
 	if err != nil {
+		h.logger.WriteError("Register():" + err.Error())
 		http.Error(w, "Неправильные username или password", http.StatusUnauthorized)
 		return
 	}

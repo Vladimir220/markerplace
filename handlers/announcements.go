@@ -55,6 +55,7 @@ func (h Handlers) Announcements(w http.ResponseWriter, r *http.Request) {
 
 	announcements, err := h.dao.GetAnnouncements(orderType, minPrice, maxPrice, page)
 	if err != nil {
+		h.logger.WriteError("Announcements():" + err.Error())
 		http.Error(w, "server error", http.StatusInternalServerError)
 		return
 	}

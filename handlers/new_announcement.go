@@ -24,6 +24,7 @@ func (h Handlers) NewAnnouncement(w http.ResponseWriter, r *http.Request) {
 	announcement := models.ExtendedAnnouncement{}
 	err := json.NewDecoder(r.Body).Decode(&announcement)
 	if err != nil {
+		h.logger.WriteError("NewAnnouncement():" + err.Error())
 		http.Error(w, "server error", http.StatusInternalServerError)
 		return
 	}
@@ -38,6 +39,7 @@ func (h Handlers) NewAnnouncement(w http.ResponseWriter, r *http.Request) {
 	announcement.Date = time.Now()
 	_, err = h.dao.NewAnnouncement(announcement)
 	if err != nil {
+		h.logger.WriteError("NewAnnouncement():" + err.Error())
 		http.Error(w, "server error", http.StatusInternalServerError)
 		return
 	}

@@ -40,6 +40,7 @@ func (h Handlers) Login(w http.ResponseWriter, r *http.Request) {
 	a := auth.CreateAuthentication()
 	token, err := a.Login(user.Login, user.Password)
 	if err != nil {
+		h.logger.WriteError("Login():" + err.Error())
 		http.Error(w, "Неправильные username или password", http.StatusUnauthorized)
 		return
 	}
