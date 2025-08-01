@@ -3,6 +3,7 @@ package main
 import (
 	"main/handlers"
 	"main/network/middleware"
+	"main/tools/crypto"
 	"net/http"
 	"os"
 
@@ -21,7 +22,8 @@ func main() {
 		panic("following variables is not specified in env: NUM_OF_DB_CONNECTIONS")
 	}
 
-	h := handlers.CreateHandlers()
+	tm := crypto.CreateTokenManager()
+	h := handlers.CreateHandlers(tm)
 	defer h.Close()
 
 	routerPaths := mux.NewRouter()
@@ -30,7 +32,7 @@ func main() {
 	routerPaths.HandleFunc("/new_announcement", h.NewAnnouncement)
 	routerPaths.HandleFunc("/announcements", h.Announcements)
 
-	authMiddleware := middleware.CreateAuthorizationMiddleware()
+	authMiddleware := middleware.CreateAuthorizationMiddleware(tm)
 	authMiddleware.SetNext(routerPaths)
 
 	http.ListenAndServe(host, authMiddleware)

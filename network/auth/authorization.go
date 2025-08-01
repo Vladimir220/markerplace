@@ -9,9 +9,9 @@ type IAuthorization interface {
 	Authorize(ctx context.Context, token string) (updatedCtx context.Context, success bool)
 }
 
-func CreateAuthorization() IAuthorization {
+func CreateAuthorization(tokenManager crypto.ITokenManager) IAuthorization {
 	return &Authorization{
-		tokenManager: crypto.CreateTokenManager(),
+		tokenManager: tokenManager,
 	}
 }
 
@@ -20,14 +20,12 @@ type Authorization struct {
 }
 
 func (auth *Authorization) Authorize(ctx context.Context, token string) (updatedCtx context.Context, success bool) {
-	updatedCtx = ctx
-
 	user, err := auth.tokenManager.ValidateToken(token)
 	if err != nil {
 		return
 	}
 
-	ctx = context.WithValue(ctx, "user", user)
+	updatedCtx = context.WithValue(ctx, "user", user)
 	success = true
 	return
 }

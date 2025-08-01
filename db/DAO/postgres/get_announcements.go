@@ -8,7 +8,7 @@ import (
 const pageSize = 10
 
 func (md MarcketplaceDAO) GetAnnouncements(orderType *string, minPrice, maxPrice *uint, page uint) (announcements models.Announcements, err error) {
-	announcements.Ans = make([]models.ExtendedAnnouncement, pageSize)
+	announcements.Ans = make([]models.ExtendedAnnouncement, 0, pageSize)
 	announcements.PriceFilter = true
 	var filter string
 	if maxPrice != nil && minPrice != nil {

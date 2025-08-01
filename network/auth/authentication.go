@@ -12,9 +12,9 @@ type IAuthentication interface {
 	Login(login, password string) (token string, err error)
 }
 
-func CreateAuthentication() IAuthentication {
+func CreateAuthentication(tokenManager crypto.ITokenManager) IAuthentication {
 	return &Authentication{
-		tokenManager: crypto.CreateTokenManager(),
+		tokenManager: tokenManager,
 		dao:          postgres.CreateMarcketplaceDAO(),
 	}
 }

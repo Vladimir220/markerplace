@@ -32,7 +32,7 @@ func (h Handlers) Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "expected fields login and password", http.StatusBadRequest)
 	}
 
-	a := auth.CreateAuthentication()
+	a := auth.CreateAuthentication(h.tokenManager)
 	token, err := a.Register(user.Login, user.Password)
 	if err != nil {
 		h.logger.WriteError("Register():" + err.Error())
@@ -44,6 +44,6 @@ func (h Handlers) Register(w http.ResponseWriter, r *http.Request) {
 		Name:     "auth-cookie",
 		Value:    token,
 		HttpOnly: true,
-		Expires:  time.Now().Add(256),
+		Expires:  time.Now().Add(time.Hour * 256),
 	})
 }

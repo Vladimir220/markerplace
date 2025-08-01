@@ -57,6 +57,7 @@ func CreateConnectionPool() IConnectionPool {
 		return nil
 	}
 
+	checkDbExistence()
 	connectionPool.checkMigrations()
 	return connectionPool
 }
@@ -108,10 +109,10 @@ func (conn *ConnectionPool) tryReconnect() {
 	for range delta {
 		connection, err := connect()
 		if err != nil {
+			conn.logger.WriteError(fmt.Sprintf("tryReconnect(): %v", err))
+		} else {
 			conn.c = append(conn.c, connection)
 			conn.currNum++
-		} else {
-			conn.logger.WriteError(fmt.Sprintf("tryReconnect(): %v", err))
 		}
 	}
 }

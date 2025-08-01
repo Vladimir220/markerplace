@@ -38,12 +38,13 @@ func (tm *TokenManager) GenerateToken(user models.User) (token string, err error
 
 	token = id.String()
 	err = tm.tokensDAO.SetUser(token, user)
+
 	if err != nil {
 		err = fmt.Errorf("TokenManager:GenerateToken(): %v", err)
 		return
 	}
 
-	expirationTime := time.Now().Add(defaultExpirationHours)
+	expirationTime := time.Now().Add(time.Hour * defaultExpirationHours)
 
 	claims := &jwt.RegisteredClaims{
 		Subject:   token,
@@ -65,7 +66,7 @@ func (tm *TokenManager) ValidateToken(token string) (user models.User, err error
 
 	claims := &jwt.RegisteredClaims{}
 	tokenJWT, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (any, error) {
-		return defaultSigningKey, nil
+		return []byte(defaultSigningKey), nil
 	})
 
 	if err != nil {
@@ -80,6 +81,7 @@ func (tm *TokenManager) ValidateToken(token string) (user models.User, err error
 
 	token = claims.Subject
 	user, exist, err := tm.tokensDAO.GetUser(token)
+
 	if !exist {
 		err = errors.New("TokenManager:ValidateToken(): invalid token")
 		return

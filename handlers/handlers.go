@@ -12,11 +12,11 @@ type Handlers struct {
 	tokenManager crypto.ITokenManager
 }
 
-func CreateHandlers() Handlers {
+func CreateHandlers(tokenManager crypto.ITokenManager) Handlers {
 	return Handlers{
 		logger:       log.CreateLogger("Handlers"),
 		dao:          postgres.CreateMarcketplaceDAO(),
-		tokenManager: crypto.CreateTokenManager(),
+		tokenManager: tokenManager,
 	}
 }
 
