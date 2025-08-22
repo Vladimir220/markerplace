@@ -1,9 +1,9 @@
-package db
+package tools
 
 import (
 	"database/sql"
 	"fmt"
-	"main/tools/log"
+	"main/log"
 	"os"
 	"path/filepath"
 	"strconv"

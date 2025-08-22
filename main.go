@@ -1,9 +1,11 @@
 package main
 
 import (
-	"main/handlers"
+	"main/crypto"
+	"main/db/DAO/postgres"
+	"main/log/proxies"
+	"main/network/handlers"
 	"main/network/middleware"
-	"main/tools/crypto"
 	"net/http"
 	"os"
 
@@ -23,8 +25,9 @@ func main() {
 	}
 
 	tm := crypto.CreateTokenManager()
-	h := handlers.CreateHandlers(tm)
-	defer h.Close()
+	daoWithLog := proxies.CreateDAOWithLog(postgres.CreateMarketplaceDAO())
+	defer daoWithLog.Close()
+	h := handlers.CreateHandlers(tm, daoWithLog)
 
 	routerPaths := mux.NewRouter()
 	routerPaths.HandleFunc("/login", h.Login)

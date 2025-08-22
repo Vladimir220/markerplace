@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
-	ta "main/tools/auth"
+	ta "main/network/auth/tools"
 	"net/http"
 	"strconv"
 )

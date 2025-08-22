@@ -1,4 +1,4 @@
-package db
+package tools
 
 type IMigrations interface {
 	CheckMigrations()

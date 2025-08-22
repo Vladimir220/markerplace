@@ -1,7 +1,6 @@
 package crypto
 
 import (
-	"errors"
 	"fmt"
 	"main/db/DAO"
 	"main/models"
@@ -16,7 +15,7 @@ const defaultExpirationHours = 256
 
 type ITokenManager interface {
 	GenerateToken(user models.User) (token string, err error)
-	ValidateToken(token string) (user models.User, err error)
+	ValidateToken(token string) (user models.User, success bool, err error)
 }
 
 func CreateTokenManager() ITokenManager {
@@ -30,9 +29,11 @@ type TokenManager struct {
 }
 
 func (tm *TokenManager) GenerateToken(user models.User) (token string, err error) {
+	logLabel := "TokenManager:GenerateToken():"
+
 	id, err := uuid.NewRandom()
 	if err != nil {
-		err = fmt.Errorf("TokenManager:GenerateToken(): %v", err)
+		err = fmt.Errorf("%s %v", logLabel, err)
 		return
 	}
 
@@ -40,7 +41,7 @@ func (tm *TokenManager) GenerateToken(user models.User) (token string, err error
 	err = tm.tokensDAO.SetUser(token, user)
 
 	if err != nil {
-		err = fmt.Errorf("TokenManager:GenerateToken(): %v", err)
+		err = fmt.Errorf("%s %v", logLabel, err)
 		return
 	}
 
@@ -55,41 +56,40 @@ func (tm *TokenManager) GenerateToken(user models.User) (token string, err error
 
 	token, err = tokenJWT.SignedString([]byte(defaultSigningKey))
 	if err != nil {
-		err = fmt.Errorf("TokenManager:GenerateToken(): %v", err)
+		err = fmt.Errorf("%s %v", logLabel, err)
 		return
 	}
 
 	return
 }
 
-func (tm *TokenManager) ValidateToken(token string) (user models.User, err error) {
+func (tm *TokenManager) ValidateToken(token string) (user models.User, success bool, err error) {
+	logLabel := "TokenManager:ValidateToken():"
 
 	claims := &jwt.RegisteredClaims{}
 	tokenJWT, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (any, error) {
 		return []byte(defaultSigningKey), nil
 	})
-
 	if err != nil {
-		err = fmt.Errorf("TokenManager:ValidateToken(): %v", err)
+		err = fmt.Errorf("%s %v", logLabel, err)
 		return
 	}
 
 	if !tokenJWT.Valid {
-		err = errors.New("TokenManager:ValidateToken(): invalid token")
+		err = fmt.Errorf("%s invalid token", logLabel)
 		return
 	}
 
 	token = claims.Subject
 	user, exist, err := tm.tokensDAO.GetUser(token)
-
 	if !exist {
-		err = errors.New("TokenManager:ValidateToken(): invalid token")
-		return
-	}
-	if err != nil {
-		err = fmt.Errorf("TokenManager:ValidateToken(): %v", err)
+		if err != nil {
+			err = fmt.Errorf("%s %v", logLabel, err)
+			return
+		}
 		return
 	}
 
+	success = true
 	return
 }

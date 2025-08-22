@@ -3,8 +3,8 @@ package auth
 import (
 	"errors"
 	"fmt"
+	"main/crypto"
 	"main/db/DAO/postgres"
-	"main/tools/crypto"
 )
 
 type IAuthentication interface {
@@ -15,13 +15,13 @@ type IAuthentication interface {
 func CreateAuthentication(tokenManager crypto.ITokenManager) IAuthentication {
 	return &Authentication{
 		tokenManager: tokenManager,
-		dao:          postgres.CreateMarcketplaceDAO(),
+		dao:          postgres.CreateMarketplaceDAO(),
 	}
 }
 
 type Authentication struct {
 	tokenManager crypto.ITokenManager
-	dao          postgres.IMarcketplaceDAO
+	dao          postgres.IMarketplaceDAO
 }
 
 func (auth *Authentication) Register(login, password string) (token string, err error) {
@@ -37,7 +37,7 @@ func (auth *Authentication) Register(login, password string) (token string, err 
 		return
 	}
 
-	user, err := auth.dao.Registr(login, password)
+	user, _, err := auth.dao.Registr(login, password)
 	if err != nil {
 		err = fmt.Errorf("Authentication:Registr: %v", err)
 		return

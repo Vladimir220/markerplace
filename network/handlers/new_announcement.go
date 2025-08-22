@@ -3,7 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"main/models"
-	"main/tools/auth"
+	"main/network/auth/tools"
 	"net/http"
 	"time"
 )
@@ -29,7 +29,7 @@ func (h Handlers) NewAnnouncement(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, ok := auth.CheckAuth(r.Context())
+	user, ok := tools.CheckAuth(r.Context())
 	if !ok {
 		http.Error(w, "unauthorized", http.StatusUnauthorized)
 		return

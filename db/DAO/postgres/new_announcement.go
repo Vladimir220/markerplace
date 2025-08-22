@@ -6,9 +6,9 @@ import (
 	"main/models"
 )
 
-func (md MarcketplaceDAO) NewAnnouncement(announcement models.ExtendedAnnouncement) (resAnnouncement models.ExtendedAnnouncement, err error) {
+func (md MarketplaceDAO) NewAnnouncement(announcement models.ExtendedAnnouncement) (resAnnouncement models.ExtendedAnnouncement, err error) {
 	if announcement.An.Title == "" || announcement.An.Body == "" || announcement.An.PicLink == "" || announcement.AuthorLogin == "" {
-		err = errors.New("MarcketplaceDAO:NewAnnouncement: Title or Body or PicLink or AuthorLogin not specified")
+		err = errors.New("MarketplaceDAO:NewAnnouncement: Title or Body or PicLink or AuthorLogin not specified")
 		return
 	}
 
@@ -21,7 +21,7 @@ func (md MarcketplaceDAO) NewAnnouncement(announcement models.ExtendedAnnounceme
 	err = connection.QueryRow(queryStr, announcement.An.Title, announcement.An.Body, announcement.An.PicLink, announcement.An.Price, announcement.Date, announcement.AuthorLogin).
 		Scan(&resAnnouncement.An.Title, &resAnnouncement.An.Body, &resAnnouncement.An.PicLink, &resAnnouncement.An.Price, &resAnnouncement.Date, &resAnnouncement.AuthorLogin, &resAnnouncement.Id)
 	if err != nil {
-		err = fmt.Errorf("MarcketplaceDAO:NewAnnouncement: %v", err)
+		err = fmt.Errorf("MarketplaceDAO:NewAnnouncement: %v", err)
 		return
 	}
 
