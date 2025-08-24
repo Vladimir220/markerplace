@@ -9,9 +9,9 @@ import (
 
 const cookieFieldName = "auth-cookie"
 
-func CreateAuthorizationMiddleware(tokenManager crypto.ITokenManager) IMiddleware {
+func CreateAuthorizationMiddleware(tokenManager crypto.ITokenManager, infoLogs bool) IMiddleware {
 	return &AuthorizationMiddleware{
-		authorization: auth.CreateAuthorization(tokenManager),
+		authorization: auth.CreateAuthorization(tokenManager, infoLogs),
 	}
 }
 
@@ -22,7 +22,7 @@ type AuthorizationMiddleware struct {
 
 func (am *AuthorizationMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie(cookieFieldName)
-	if err != nil {
+	if err == http.ErrNoCookie {
 		am.next.ServeHTTP(w, r)
 		return
 	}

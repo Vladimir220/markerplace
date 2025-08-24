@@ -15,10 +15,9 @@ func (md MarketplaceDAO) GetUser(login string) (user models.User, password strin
 
 	queryStr := "SELECT login, group_name, password FROM users WHERE login=$1;"
 
-	connection := md.сonnectionPool.GetConnection()
-
-	err = connection.QueryRow(queryStr, login).Scan(&user.Login, &user.Group, &password)
+	err = md.connection.QueryRow(queryStr, login).Scan(&user.Login, &user.Group, &password)
 	if err == sql.ErrNoRows {
+		err = nil
 		return
 	} else if err != nil {
 		err = fmt.Errorf("MarketplaceDAO:GetUser: %v", err)

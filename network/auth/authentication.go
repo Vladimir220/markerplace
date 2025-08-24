@@ -5,67 +5,110 @@ import (
 	"fmt"
 	"main/crypto"
 	"main/db/DAO/postgres"
+	"main/log"
 )
+
+var ErrLogin = errors.New("Incorrect password or login")
+var ErrLoginFormat = errors.New("Incorrect login format")
+var ErrPasswordFormat = errors.New("Incorrect password format")
+var ErrLoginIsTaken = errors.New("Login is taken")
+var ErrServer = errors.New("Server error")
 
 type IAuthentication interface {
 	Register(login, password string) (token string, err error)
 	Login(login, password string) (token string, err error)
 }
 
-func CreateAuthentication(tokenManager crypto.ITokenManager) IAuthentication {
+func CreateAuthentication(tokenManager crypto.ITokenManager, infoLogs bool) (IAuthentication, error) {
+	dao, err := postgres.CreateMarketplaceDAO()
+	if err != nil {
+		return nil, fmt.Errorf("CreateAuthentication():%v", err)
+	}
 	return &Authentication{
 		tokenManager: tokenManager,
-		dao:          postgres.CreateMarketplaceDAO(),
-	}
+		dao:          dao,
+		logger:       log.CreateLogger("Authentication"),
+		infoLogs:     infoLogs,
+	}, nil
 }
 
 type Authentication struct {
 	tokenManager crypto.ITokenManager
 	dao          postgres.IMarketplaceDAO
+	logger       log.ILogger
+	infoLogs     bool
 }
 
 func (auth *Authentication) Register(login, password string) (token string, err error) {
+	logLabel := fmt.Sprintf("Register():[params:%s,%s]:", login, "***")
 	ok := auth.checkLogin(login)
 	if !ok {
-		err = errors.New("Authentication:Register: incorrect login")
+		err = ErrLoginFormat
 		return
 	}
 
 	password, err = crypto.GetHashedPassword(password)
 	if err != nil {
-		err = fmt.Errorf("Authentication:Registr: %v", err)
+		auth.logger.WriteError(fmt.Sprintf("%s %v", logLabel, err))
+		err = ErrServer
 		return
 	}
 
-	user, _, err := auth.dao.Registr(login, password)
+	user, isAlreadyExist, err := auth.dao.Registr(login, password)
 	if err != nil {
-		err = fmt.Errorf("Authentication:Registr: %v", err)
+		err = ErrServer
+		return
+	}
+	if isAlreadyExist {
+		err = ErrLoginIsTaken
 		return
 	}
 
-	token, err = auth.tokenManager.GenerateToken(user)
+	token, isErr := auth.tokenManager.GenerateToken(user)
+	if isErr {
+		err = ErrServer
+		return
+	}
 
+	if auth.infoLogs {
+		auth.logger.WriteInfo(fmt.Sprintf("%s %s", logLabel, "registered"))
+	}
 	return
 }
 
 func (auth *Authentication) Login(login, password string) (token string, err error) {
+	logLabel := fmt.Sprintf("Login():[params:%s,%s]:", login, "***")
+
 	user, realPassword, isFound, err := auth.dao.GetUser(login)
 	if !isFound {
-		err = fmt.Errorf("Authentication:Login: user '%s' not found", login)
+		err = ErrLogin
 		return
 	}
 	if err != nil {
-		err = fmt.Errorf("Authentication:Login: %v", err)
+		err = ErrServer
 		return
 	}
 
-	equal := crypto.ComparePassword(password, realPassword)
+	equal, err := crypto.ComparePassword(password, realPassword)
+	if err != nil {
+		auth.logger.WriteError(fmt.Sprintf("%s %v", logLabel, err))
+		err = ErrServer
+		return
+	}
 	if !equal {
-		err = errors.New("Authentication:Login: incorrect password")
+		err = ErrLogin
 		return
 	}
 
-	token, err = auth.tokenManager.GenerateToken(user)
+	token, isErr := auth.tokenManager.GenerateToken(user)
+	if isErr {
+		err = ErrServer
+		return
+	}
+
+	if auth.infoLogs {
+		auth.logger.WriteInfo(fmt.Sprintf("%s %s", logLabel, "login"))
+	}
 
 	return
 }

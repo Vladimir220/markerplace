@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"main/network/auth"
 	"net/http"
 	"time"
@@ -14,12 +15,12 @@ type user struct {
 
 func (h Handlers) Login(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
+	logLabel := "Login():"
+
 	if r.Method != http.MethodPost {
 		http.Error(w, "expected POST", http.StatusMethodNotAllowed)
 		return
 	}
-
-	user := user{}
 
 	contentType := r.Header.Get("Content-Type")
 	if contentType != "application/json" {
@@ -27,8 +28,11 @@ func (h Handlers) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user := user{}
+
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
+		h.logger.WriteError(fmt.Sprintf("%s %v", logLabel, err))
 		http.Error(w, "server error", http.StatusInternalServerError)
 		return
 	}
@@ -37,11 +41,20 @@ func (h Handlers) Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "expected fields login and password", http.StatusBadRequest)
 	}
 
-	a := auth.CreateAuthentication(h.tokenManager)
-	token, err := a.Login(user.Login, user.Password)
+	a, err := auth.CreateAuthentication(h.tokenManager, h.infoLogs)
 	if err != nil {
-		h.logger.WriteError("Login():" + err.Error())
-		http.Error(w, "Неправильные username или password", http.StatusUnauthorized)
+		h.logger.WriteError(fmt.Sprintf("%s %v", logLabel, err))
+		http.Error(w, "server error", http.StatusInternalServerError)
+		return
+	}
+
+	token, err := a.Login(user.Login, user.Password)
+	switch err {
+	case auth.ErrLogin:
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	case auth.ErrServer:
+		http.Error(w, "server error", http.StatusInternalServerError)
 		return
 	}
 

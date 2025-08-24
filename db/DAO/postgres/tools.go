@@ -1,4 +1,4 @@
-package tools
+package postgres
 
 import (
 	"database/sql"
@@ -26,8 +26,11 @@ func connect() (db *sql.DB, err error) {
 }
 
 func checkDbExistence() (err error) {
+	logLabel := "checkDbExistence():"
+
 	user, password, dbName, host, err := getEnvLoginData()
 	if err != nil {
+		err = fmt.Errorf("%s%v", logLabel, err)
 		return
 	}
 
@@ -35,6 +38,7 @@ func checkDbExistence() (err error) {
 
 	tempConn, err := sql.Open("postgres", loginInfo)
 	if err != nil {
+		err = fmt.Errorf("%s %v", logLabel, err)
 		return
 	}
 
@@ -43,12 +47,14 @@ func checkDbExistence() (err error) {
 	var isDbExist bool
 	err = tempConn.QueryRow(query, dbName).Scan(&isDbExist)
 	if err != nil {
+		err = fmt.Errorf("%s %v", logLabel, err)
 		return
 	}
 
 	if !isDbExist {
 		_, err = tempConn.Exec(fmt.Sprintf("CREATE DATABASE %s;", dbName))
 		if err != nil {
+			err = fmt.Errorf("%s %v", logLabel, err)
 			return
 		}
 	}
@@ -61,7 +67,7 @@ func getEnvLoginData() (user, password, dbName, host string, err error) {
 	dbName = os.Getenv("DB_NAME")
 	host = os.Getenv("DB_HOST")
 	if user == "" || password == "" || dbName == "" || host == "" {
-		err = errors.New("one of the following variables is not specified in env: DB_USER, DB_PASSWORD, DB_NAME, DB_HOST")
+		err = errors.New("getEnvLoginData(): one of the following variables is not specified in env: DB_USER, DB_PASSWORD, DB_NAME, DB_HOST")
 		return
 	}
 	return

@@ -2,13 +2,27 @@ package handlers
 
 import (
 	"encoding/json"
-	ta "main/network/auth/tools"
+	"fmt"
+	"main/network/auth/tools"
 	"net/http"
 	"strconv"
 )
 
 func (h Handlers) Announcements(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
+	logLabel := "Announcements():"
+
+	if r.Method != http.MethodGet {
+		http.Error(w, "expected GET", http.StatusMethodNotAllowed)
+		return
+	}
+
+	user, ok := tools.CheckAuth(r.Context())
+	if !ok {
+		h.logger.WriteWarning(fmt.Sprintf("%s %s", logLabel, "an unauthorized user has gained access to the handler"))
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	orderTypeStr := r.URL.Query().Get("order-type")
 	var orderType *string
@@ -43,8 +57,6 @@ func (h Handlers) Announcements(w http.ResponseWriter, r *http.Request) {
 	pageStr := r.URL.Query().Get("page")
 	var page uint
 	if pageStr != "" {
-		page = 0
-	} else {
 		page64, err := strconv.ParseUint(pageStr, 10, 64)
 		if err != nil {
 			http.Error(w, "page requires uint", http.StatusBadRequest)
@@ -55,14 +67,7 @@ func (h Handlers) Announcements(w http.ResponseWriter, r *http.Request) {
 
 	announcements, err := h.dao.GetAnnouncements(orderType, minPrice, maxPrice, page)
 	if err != nil {
-		h.logger.WriteError("Announcements():" + err.Error())
 		http.Error(w, "server error", http.StatusInternalServerError)
-		return
-	}
-
-	user, ok := ta.CheckAuth(r.Context())
-	if !ok {
-		http.Error(w, "unauthorized", http.StatusUnauthorized)
 		return
 	}
 
@@ -72,7 +77,12 @@ func (h Handlers) Announcements(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	res, _ := json.Marshal(announcements)
+	res, err := json.Marshal(announcements)
+	if err != nil {
+		h.logger.WriteError(fmt.Sprintf("%s %v", logLabel, err))
+		http.Error(w, "server error", http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(res))

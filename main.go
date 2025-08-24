@@ -2,6 +2,7 @@ package main
 
 import (
 	"main/crypto"
+	"main/db/DAO"
 	"main/db/DAO/postgres"
 	"main/log/proxies"
 	"main/network/handlers"
@@ -24,10 +25,16 @@ func main() {
 		panic("following variables is not specified in env: NUM_OF_DB_CONNECTIONS")
 	}
 
-	tm := crypto.CreateTokenManager()
-	daoWithLog := proxies.CreateDAOWithLog(postgres.CreateMarketplaceDAO())
+	tokensDAO := proxies.CreateTokensDAOWithLog(DAO.CreateTokensDAO(), false)
+	tm := crypto.CreateTokenManager(tokensDAO, false)
+	dao, err := postgres.CreateMarketplaceDAO()
+	if err != nil {
+		panic(err)
+	}
+
+	daoWithLog := proxies.CreateDAOWithLog(dao, true)
 	defer daoWithLog.Close()
-	h := handlers.CreateHandlers(tm, daoWithLog)
+	h := handlers.CreateHandlers(tm, daoWithLog, true)
 
 	routerPaths := mux.NewRouter()
 	routerPaths.HandleFunc("/login", h.Login)
@@ -35,7 +42,7 @@ func main() {
 	routerPaths.HandleFunc("/new_announcement", h.NewAnnouncement)
 	routerPaths.HandleFunc("/announcements", h.Announcements)
 
-	authMiddleware := middleware.CreateAuthorizationMiddleware(tm)
+	authMiddleware := middleware.CreateAuthorizationMiddleware(tm, false)
 	authMiddleware.SetNext(routerPaths)
 
 	http.ListenAndServe(host, authMiddleware)

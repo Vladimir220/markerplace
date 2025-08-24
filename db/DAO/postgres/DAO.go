@@ -1,8 +1,17 @@
 package postgres
 
 import (
-	"main/db/tools"
+	"database/sql"
+	"fmt"
 	"main/models"
+	"os"
+	"path/filepath"
+
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+	_ "github.com/lib/pq"
 )
 
 type IMarketplaceDAO interface {
@@ -13,16 +22,70 @@ type IMarketplaceDAO interface {
 	Close()
 }
 
-func CreateMarketplaceDAO() IMarketplaceDAO {
-	return MarketplaceDAO{
-		сonnectionPool: tools.CreateConnectionPool(),
+func CreateMarketplaceDAO() (dao IMarketplaceDAO, err error) {
+	logLabel := "CreateMarketplaceDAO():"
+
+	err = checkDbExistence()
+	if err != nil {
+		err = fmt.Errorf("%s%v", logLabel, err)
+		return
 	}
+
+	connection, err := connect()
+	if err != nil {
+		err = fmt.Errorf("%s%v", logLabel, err)
+		return
+	}
+
+	mpDao := &MarketplaceDAO{
+		connection: connection,
+	}
+
+	err = mpDao.checkMigrations()
+	if err != nil {
+		err = fmt.Errorf("%s%v", logLabel, err)
+		return
+	}
+
+	return mpDao, nil
 }
 
 type MarketplaceDAO struct {
-	сonnectionPool tools.IConnectionPool
+	connection *sql.DB
 }
 
 func (md MarketplaceDAO) Close() {
-	md.сonnectionPool.Close()
+	md.connection.Close()
+}
+
+func (md *MarketplaceDAO) checkMigrations() error {
+	logLabel := "checkMigrations():"
+
+	if md.connection == nil {
+		return fmt.Errorf("%s no connection", logLabel)
+	}
+
+	driver, err := postgres.WithInstance(md.connection, &postgres.Config{})
+	if err != nil {
+		return fmt.Errorf("%s checkMigrations(): %v", logLabel, err)
+	}
+
+	dbName := os.Getenv("DB_NAME")
+	var path string
+	currentDir, _ := os.Getwd()
+	path = filepath.ToSlash(currentDir)
+	if path != "" {
+		path = path + "/"
+	}
+
+	m, err := migrate.NewWithDatabaseInstance("file://"+path+"db/migrations", dbName, driver)
+	if err != nil {
+		return fmt.Errorf("%s checkMigrations(): %v", logLabel, err)
+	}
+
+	if err = m.Up(); err != nil && err != migrate.ErrNoChange {
+		return fmt.Errorf("%s checkMigrations(): %v", logLabel, err)
+	}
+
+	return nil
 }

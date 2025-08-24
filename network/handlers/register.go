@@ -2,12 +2,14 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"main/network/auth"
 	"net/http"
 	"time"
 )
 
 func (h Handlers) Register(w http.ResponseWriter, r *http.Request) {
+	logLabel := "Register():"
 	defer r.Body.Close()
 	if r.Method != http.MethodPost {
 		http.Error(w, "expected POST", http.StatusMethodNotAllowed)
@@ -24,6 +26,7 @@ func (h Handlers) Register(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
+		h.logger.WriteError(fmt.Sprintf("%s %v", logLabel, err))
 		http.Error(w, "server error", http.StatusInternalServerError)
 		return
 	}
@@ -32,11 +35,20 @@ func (h Handlers) Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "expected fields login and password", http.StatusBadRequest)
 	}
 
-	a := auth.CreateAuthentication(h.tokenManager)
-	token, err := a.Register(user.Login, user.Password)
+	a, err := auth.CreateAuthentication(h.tokenManager, h.infoLogs)
 	if err != nil {
-		h.logger.WriteError("Register():" + err.Error())
-		http.Error(w, "Неправильные username или password", http.StatusUnauthorized)
+		h.logger.WriteError(fmt.Sprintf("%s %v", logLabel, err))
+		http.Error(w, "server error", http.StatusInternalServerError)
+		return
+	}
+
+	token, err := a.Register(user.Login, user.Password)
+	switch err {
+	case auth.ErrLoginIsTaken, auth.ErrLoginFormat, auth.ErrPasswordFormat:
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	case auth.ErrServer:
+		http.Error(w, "server error", http.StatusInternalServerError)
 		return
 	}
 

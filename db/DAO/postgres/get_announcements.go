@@ -51,9 +51,7 @@ func (md MarketplaceDAO) GetAnnouncements(orderType *string, minPrice, maxPrice 
 
 	queryStr := fmt.Sprintf("SELECT title, body, pic_link, price, date, author_login, id FROM announcements %s %s %s %s;", filter, order, offset, limit)
 
-	connection := md.сonnectionPool.GetConnection()
-
-	rows, err := connection.Query(queryStr)
+	rows, err := md.connection.Query(queryStr)
 	if err != nil {
 		err = fmt.Errorf("MarketplaceDAO:GetUser: %v", err)
 		return

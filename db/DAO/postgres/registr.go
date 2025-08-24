@@ -18,11 +18,10 @@ func (md MarketplaceDAO) Registr(login, password string) (user models.User, isAl
 				ON CONFLICT (login) DO NOTHING
 				RETURNING login, group_name;`
 
-	connection := md.сonnectionPool.GetConnection()
-
-	err = connection.QueryRow(queryStr, login, password).Scan(&user.Login, &user.Group)
+	err = md.connection.QueryRow(queryStr, login, password).Scan(&user.Login, &user.Group)
 	if err == sql.ErrNoRows {
 		isAlreadyExist = true
+		err = nil
 	} else if err != nil {
 		err = fmt.Errorf("MarketplaceDAO:Registr: %v", err)
 		return
