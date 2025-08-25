@@ -3,7 +3,8 @@ package models
 import "time"
 
 type User struct {
-	Login, Group string
+	Login string `redis:"login"`
+	Group string `redis:"group"`
 }
 
 type Announcement struct {
