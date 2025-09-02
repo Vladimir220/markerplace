@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package reader_db_service;
+option go_package = "reader_db_service/gen;gen";
+
+service Reader {
+    rpc GetAnnouncements (AnnouncementsRequest) returns (AnnouncementsResponse);
+}
+
+message AnnouncementsRequest {
+    optional string orderType = 1;
+    optional string minPrice = 2;
+    optional string maxPrice = 3;
+    uint64 page = 4;
+}
+
+message Announcement {
+    string Title = 1;
+    string Body = 2;
+    string PicLink = 3;
+    uint64 Price = 4;
+    uint64 Id = 5;
+    string AuthorLogin = 6;
+    int64 Date_unix_timestamp = 7;
+}
+
+message AnnouncementsResponse {
+    repeated Announcement Ans = 1;
+    uint64 Page = 2;
+    uint64 MaxPage = 3;
+    uint64 MinPrice = 4;
+    bool PriceFilter = 5;
+}

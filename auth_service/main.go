@@ -1,0 +1,64 @@
+package main
+
+import (
+	"auth_service/crypto"
+	"auth_service/db/DAO/redis"
+	"auth_service/env"
+	"auth_service/gen"
+	"auth_service/log"
+	"auth_service/network/auth"
+	"context"
+	"fmt"
+	"net"
+
+	"google.golang.org/grpc"
+)
+
+func main() {
+	logLabel := "main():"
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	logger := log.CreateLoggerAdapter(ctx, "main()")
+
+	host, _, err := env.GetServiceData()
+	if err != nil {
+		logger.WriteError(err.Error())
+		panic(err)
+	}
+
+	tokensDao, err := redis.CreateTokensDAO()
+	if err != nil {
+		err = fmt.Errorf("%s%v", logLabel, err)
+		logger.WriteError(err.Error())
+		panic(err)
+	}
+
+	tokenManager := crypto.CreateTokenManager(ctx, tokensDao, false)
+	auth, err := auth.CreateAuthentication(ctx, tokenManager, true)
+	if err != nil {
+		err = fmt.Errorf("%s%v", logLabel, err)
+		logger.WriteError(err.Error())
+		panic(err)
+	}
+
+	server := CreateServer(ctx, auth, tokenManager)
+
+	lis, err := net.Listen("tcp", host)
+	if err != nil {
+		logger.WriteError(err.Error())
+		panic(err)
+	}
+
+	var opts []grpc.ServerOption
+	serverGRPC := grpc.NewServer(opts...)
+
+	gen.RegisterAuthServer(serverGRPC, server)
+
+	err = serverGRPC.Serve(lis)
+	if err != nil {
+		logger.WriteError(err.Error())
+		panic(err)
+	}
+}

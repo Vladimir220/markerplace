@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package auth_service;
+option go_package = "auth_service/gen;gen";
+
+service Auth {
+    rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse);
+    rpc Register (RegisterRequest) returns (RegisterResponse);
+    rpc Login (LoginRequest) returns (LoginResponse);
+}
+
+message RegisterRequest {
+    string login = 1;
+    string password = 2;
+}
+
+message LoginRequest {
+    string login = 1;
+    string password = 2;
+}
+
+message RegisterResponse {
+    string token = 1;
+}
+
+message LoginResponse {
+    string token = 1;
+}
+
+
+message ValidateTokenRequest {
+    string token = 1;
+}
+
+
+message ValidateTokenResponse {
+    string token = 1;
+    string login = 2;
+    string group = 3;
+    bool isValid = 4;
+}

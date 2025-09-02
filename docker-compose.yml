@@ -3,18 +3,94 @@ services:
     image: postgres
     environment:
       POSTGRES_PASSWORD: qwerty
+
+
     ports:
       - '5432:5432'
-  marketplace:
-    build:
-      dockerfile: ./.Dockerfile
-    ports:
-      - "1234:1234"
-    volumes:
-      - .\:/app/
-    depends_on:
-     - postgres
+  
   redis:
     image: redis
     ports:
       - '6379:6379'
+
+  kafka:
+    image: bitnami/kafka:4.0.0
+    environment:
+    - KAFKA_CFG_NODE_ID=0
+    - KAFKA_CFG_PROCESS_ROLES=controller,broker
+    - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+    - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+    - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+    - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+    ports:
+      - '9092:9092'
+      - '9093:9093'
+
+  logger_service:
+    build:
+      dockerfile: ./logger_service/.Dockerfile
+    ports:
+      - "1234:1234"
+    volumes:
+      - .\logger_service\:/app/
+    depends_on:
+     - postgres
+     - redis
+     - kafka
+
+  migration_service:
+    build:
+      dockerfile: ./migration_service/.Dockerfile
+    volumes:
+      - .\migration_service\:/app/
+    depends_on:
+     - postgres
+     - kafka
+     - logger_service
+
+  auth_service:
+    build:
+      dockerfile: ./auth_service/.Dockerfile
+    volumes:
+      - .\auth_service\:/app/
+    depends_on:
+     - postgres
+     - kafka
+     - logger_service
+     - migration_service
+
+  reader_db_service:
+    build:
+      dockerfile: ./reader_db_service/.Dockerfile
+    volumes:
+      - .\reader_db_service\:/app/
+    depends_on:
+     - postgres
+     - kafka
+     - logger_service
+     - migration_service
+
+  writer_db_service:
+    build:
+      dockerfile: ./writer_db_service/.Dockerfile
+    volumes:
+      - .\writer_db_service\:/app/
+    depends_on:
+     - postgres
+     - kafka
+     - logger_service
+     - migration_service
+
+  marketplace:
+    build:
+      dockerfile: ./marketplace/.Dockerfile
+    ports:
+      - "1234:1234"
+    volumes:
+      - .\marketplace\:/app/
+    depends_on:
+     - postgres
+     - redis
+     - kafka
+     - logger_service
+     - migration_service
