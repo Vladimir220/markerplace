@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS announcements (
     pic_link TEXT NOT NULL,
     author_login VARCHAR(50) NOT NULL,
     price INT,
-    date TIMESTAMP
+    date TIMESTAMP,
 
     FOREIGN KEY (author_login) REFERENCES users(login) ON UPDATE CASCADE
 );

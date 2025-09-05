@@ -1,20 +1,20 @@
-package auth
+package authorization
 
 import (
 	"context"
 	"fmt"
-	"main/crypto"
-	"main/log"
+	"marketplace/crypto"
+	"marketplace/log"
 )
 
 type IAuthorization interface {
 	Authorize(ctx context.Context, token string) (updatedCtx context.Context, success bool)
 }
 
-func CreateAuthorization(tokenManager crypto.ITokenManager, infoLogs bool) IAuthorization {
+func CreateAuthorization(ctx context.Context, tokenManager crypto.ITokenManager, infoLogs bool) IAuthorization {
 	return &Authorization{
 		tokenManager: tokenManager,
-		logger:       log.CreateLogger("Authorization"),
+		logger:       log.CreateLoggerAdapter(ctx, "Authorization"),
 		infoLogs:     infoLogs,
 	}
 }

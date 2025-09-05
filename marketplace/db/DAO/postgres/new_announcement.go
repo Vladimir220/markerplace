@@ -3,7 +3,7 @@ package postgres
 import (
 	"errors"
 	"fmt"
-	"main/models"
+	"marketplace/models"
 )
 
 func (md MarketplaceDAO) NewAnnouncement(announcement models.ExtendedAnnouncement) (resAnnouncement models.ExtendedAnnouncement, err error) {

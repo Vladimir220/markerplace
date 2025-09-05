@@ -47,7 +47,7 @@ func GetPostgresEnvData() (data PostgresEnvData, err error) {
 
 func GetServiceData() (host, serviceName string, err error) {
 	host = os.Getenv("GRPC_HOST")
-	serviceName = os.Getenv("DB_PASSWORD")
+	serviceName = os.Getenv("SERVICE_NAME")
 	if host == "" || serviceName == "" {
 		err = errors.New("GetServiceData(): one of the following variables is not specified in .env: GRPC_HOST, DB_PASSWORD")
 		return

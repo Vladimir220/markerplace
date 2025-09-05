@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"fmt"
-	"main/models"
+	"marketplace/models"
 )
 
 const pageSize = 10

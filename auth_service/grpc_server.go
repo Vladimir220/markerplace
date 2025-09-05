@@ -4,6 +4,7 @@ import (
 	"auth_service/crypto"
 	"auth_service/gen"
 	"auth_service/log"
+	"auth_service/models"
 	"auth_service/network/auth"
 	"context"
 	"fmt"
@@ -27,6 +28,7 @@ type Server struct {
 
 func (s Server) ValidateToken(ctx context.Context, req *gen.ValidateTokenRequest) (resp *gen.ValidateTokenResponse, err error) {
 	logLabel := "ValidateToken():"
+	fmt.Println("я отработал")
 
 	if req == nil {
 		err = fmt.Errorf("%s %s", logLabel, "ValidateTokenRequest is nil")
@@ -85,6 +87,32 @@ func (s Server) Login(ctx context.Context, req *gen.LoginRequest) (resp *gen.Log
 	}
 
 	resp = &gen.LoginResponse{
+		Token: token,
+	}
+
+	return
+
+}
+
+func (s Server) GenerateToken(ctx context.Context, req *gen.GenerateTokenRequest) (resp *gen.GenerateTokenResponse, err error) {
+	logLabel := "GenerateToken():"
+
+	if req == nil {
+		err = fmt.Errorf("%s %s", logLabel, "GenerateTokenRequest is nil")
+		s.logger.WriteError(err.Error())
+		return
+	}
+
+	token, isErr := s.tokenManager.GenerateToken(models.User{
+		Login: req.GetLogin(),
+		Group: req.GetGroup(),
+	})
+	if isErr {
+		err = fmt.Errorf("%s %s", logLabel, "Error")
+		return
+	}
+
+	resp = &gen.GenerateTokenResponse{
 		Token: token,
 	}
 

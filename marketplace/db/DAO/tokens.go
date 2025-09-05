@@ -1,7 +1,7 @@
 package DAO
 
 import (
-	"main/models"
+	"marketplace/models"
 	"sync"
 )
 

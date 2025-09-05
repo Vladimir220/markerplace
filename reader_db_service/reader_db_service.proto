@@ -9,8 +9,8 @@ service Reader {
 
 message AnnouncementsRequest {
     optional string orderType = 1;
-    optional string minPrice = 2;
-    optional string maxPrice = 3;
+    optional uint64 minPrice = 2;
+    optional uint64 maxPrice = 3;
     uint64 page = 4;
 }
 

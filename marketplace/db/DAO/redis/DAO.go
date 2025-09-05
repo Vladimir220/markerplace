@@ -3,8 +3,8 @@ package redis
 import (
 	"context"
 	"fmt"
-	"main/db/DAO"
-	"main/models"
+	"marketplace/db/DAO"
+	"marketplace/models"
 	"time"
 
 	"github.com/redis/go-redis/v9"

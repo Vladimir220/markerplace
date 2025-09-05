@@ -1,16 +1,17 @@
 package proxies
 
 import (
+	"context"
 	"fmt"
-	"main/db/DAO"
-	"main/log"
-	"main/models"
+	"marketplace/db/DAO"
+	"marketplace/log"
+	"marketplace/models"
 )
 
-func CreateTokensDAOWithLog(dao DAO.ITokensDAO, infoLogs bool) DAO.ITokensDAO {
+func CreateTokensDAOWithLog(ctx context.Context, dao DAO.ITokensDAO, infoLogs bool) DAO.ITokensDAO {
 	return &TokensDAOWithLog{
 		original: dao,
-		logger:   log.CreateLogger("ITokensDAO"),
+		logger:   log.CreateLoggerAdapter(ctx, "ITokensDAO"),
 		infoLogs: infoLogs,
 	}
 }

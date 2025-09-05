@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"reader_db_service/DAO/postgres"
 	"reader_db_service/gen"
-	"strconv"
 )
 
 func CreateServer(dao postgres.IMarketplaceDAO) gen.ReaderServer {
@@ -20,29 +20,22 @@ type Server struct {
 }
 
 func (s Server) GetAnnouncements(ctx context.Context, req *gen.AnnouncementsRequest) (resp *gen.AnnouncementsResponse, err error) {
+	fmt.Println("я отработал1")
 	if req == nil {
 		err = errors.New("AnnouncementsRequest is nil")
 		return
 	}
 
+	fmt.Println("я отработал")
+
 	var minPrice, maxPrice *uint
 	if req.MinPrice != nil {
 		minPrice = new(uint)
-		var buf uint64
-		buf, err = strconv.ParseUint(*req.MinPrice, 10, 64)
-		if err != nil {
-			return
-		}
-		*minPrice = uint(buf)
+		*minPrice = uint(*req.MinPrice)
 	}
 	if req.MaxPrice != nil {
 		maxPrice = new(uint)
-		var buf uint64
-		buf, err = strconv.ParseUint(*req.MaxPrice, 10, 64)
-		if err != nil {
-			return
-		}
-		*maxPrice = uint(buf)
+		*maxPrice = uint(*req.MaxPrice)
 	}
 
 	announcement, err := s.dao.GetAnnouncements(req.OrderType, minPrice, maxPrice, uint(req.Page))

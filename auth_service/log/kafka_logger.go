@@ -47,7 +47,7 @@ func (l KafkaLogger) WriteWarning(msg string) (err error) {
 	defer writer.Close()
 
 	err = writer.WriteMessages(l.ctx, kafka.Message{
-		Value: []byte(fmt.Sprintf("%s:%s: %s\n", l.serviceName, l.parentName, msg)),
+		Value: []byte(fmt.Sprintf("%s:%s: %s", l.serviceName, l.parentName, msg)),
 	})
 	return
 }
@@ -63,7 +63,7 @@ func (l KafkaLogger) WriteError(msg string) (err error) {
 	defer writer.Close()
 
 	err = writer.WriteMessages(l.ctx, kafka.Message{
-		Value: []byte(fmt.Sprintf("%s:%s: %s\n", l.serviceName, l.parentName, msg)),
+		Value: []byte(fmt.Sprintf("%s:%s: %s", l.serviceName, l.parentName, msg)),
 	})
 	return
 }
@@ -79,7 +79,7 @@ func (l KafkaLogger) WriteInfo(msg string) (err error) {
 	defer writer.Close()
 
 	err = writer.WriteMessages(l.ctx, kafka.Message{
-		Value: []byte(fmt.Sprintf("%s:%s: %s\n", l.serviceName, l.parentName, msg)),
+		Value: []byte(fmt.Sprintf("%s:%s: %s", l.serviceName, l.parentName, msg)),
 	})
 	return
 }

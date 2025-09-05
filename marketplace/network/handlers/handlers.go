@@ -1,9 +1,10 @@
 package handlers
 
 import (
-	"main/crypto"
-	"main/db/DAO/postgres"
-	"main/log"
+	"context"
+	"marketplace/crypto"
+	"marketplace/db/DAO/postgres"
+	"marketplace/log"
 )
 
 type Handlers struct {
@@ -11,13 +12,15 @@ type Handlers struct {
 	dao          postgres.IMarketplaceDAO
 	tokenManager crypto.ITokenManager
 	infoLogs     bool
+	ctx          context.Context
 }
 
-func CreateHandlers(tokenManager crypto.ITokenManager, dao postgres.IMarketplaceDAO, infoLogs bool) Handlers {
+func CreateHandlers(ctx context.Context, tokenManager crypto.ITokenManager, dao postgres.IMarketplaceDAO, infoLogs bool) Handlers {
 	return Handlers{
-		logger:       log.CreateLogger("Handlers"),
+		logger:       log.CreateLoggerAdapter(ctx, "Handlers"),
 		dao:          dao,
 		tokenManager: tokenManager,
 		infoLogs:     infoLogs,
+		ctx:          ctx,
 	}
 }

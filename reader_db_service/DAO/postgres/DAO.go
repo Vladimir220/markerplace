@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"reader_db_service/models"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -16,19 +17,13 @@ type IMarketplaceDAO interface {
 func CreateMarketplaceDAO() (dao IMarketplaceDAO, err error) {
 	logLabel := "CreateMarketplaceDAO():"
 
-	err = checkDbExistence()
+	err = checkDbExistence(5, time.Second)
 	if err != nil {
 		err = fmt.Errorf("%s%v", logLabel, err)
 		return
 	}
 
 	connection, err := connect()
-	if err != nil {
-		err = fmt.Errorf("%s%v", logLabel, err)
-		return
-	}
-
-	err = CheckMigrations(connection)
 	if err != nil {
 		err = fmt.Errorf("%s%v", logLabel, err)
 		return

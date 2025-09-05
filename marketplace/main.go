@@ -1,14 +1,15 @@
 package main
 
 import (
-	"main/crypto"
-	"main/db/DAO/postgres"
-	"main/db/DAO/redis"
-	"main/log/proxies"
-	"main/network/handlers"
-	"main/network/middleware"
+	"context"
+	"marketplace/crypto"
+	"marketplace/db/DAO/postgres"
+	"marketplace/db/DAO/redis"
+	"marketplace/env"
+	"marketplace/log/proxies"
+	"marketplace/network/handlers"
+	"marketplace/network/middleware"
 	"net/http"
-	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -20,26 +21,30 @@ func main() {
 		panic(err)
 	}
 
-	host := os.Getenv("HOST")
-	if host == "" {
-		panic("following variables is not specified in env: HOST")
+	host, _, err := env.GetServiceData()
+	if err != nil {
+		panic(err)
 	}
 
 	td, err := redis.CreateTokensDAO()
 	if err != nil {
 		panic(err)
 	}
-	tokensDAO := proxies.CreateTokensDAOWithLog(td, true)
-	tm := crypto.CreateTokenManager(tokensDAO, true)
 
-	dao, err := postgres.CreateMarketplaceDAO()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	tokensDAO := proxies.CreateTokensDAOWithLog(ctx, td, true)
+	tm := crypto.CreateTokenManagerProxy(ctx, tokensDAO, true)
+
+	dao, err := postgres.CreateDAOProxy(ctx)
 	if err != nil {
 		panic(err)
 	}
-	daoWithLog := proxies.CreateDAOWithLog(dao, true)
+	daoWithLog := proxies.CreateDAOWithLog(ctx, dao, true)
 	defer daoWithLog.Close()
 
-	h := handlers.CreateHandlers(tm, daoWithLog, true)
+	h := handlers.CreateHandlers(ctx, tm, daoWithLog, true)
 
 	routerPaths := mux.NewRouter()
 	routerPaths.HandleFunc("/login", h.Login)
@@ -47,7 +52,7 @@ func main() {
 	routerPaths.HandleFunc("/new_announcement", h.NewAnnouncement)
 	routerPaths.HandleFunc("/announcements", h.Announcements)
 
-	authMiddleware := middleware.CreateAuthorizationMiddleware(tm, true)
+	authMiddleware := middleware.CreateAuthorizationMiddleware(ctx, tm, true)
 	authMiddleware.SetNext(routerPaths)
 
 	http.ListenAndServe(host, authMiddleware)

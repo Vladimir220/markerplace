@@ -3,7 +3,8 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"main/network/auth"
+	"marketplace/network/auth/authentication"
+	"marketplace/network/auth/tools"
 	"net/http"
 	"time"
 )
@@ -41,7 +42,7 @@ func (h Handlers) Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "expected fields login and password", http.StatusBadRequest)
 	}
 
-	a, err := auth.CreateAuthentication(h.tokenManager, h.infoLogs)
+	a, err := authentication.CreateAuthenticationProxy(h.ctx, h.tokenManager, h.infoLogs)
 	if err != nil {
 		h.logger.WriteError(fmt.Sprintf("%s %v", logLabel, err))
 		http.Error(w, "server error", http.StatusInternalServerError)
@@ -50,10 +51,10 @@ func (h Handlers) Login(w http.ResponseWriter, r *http.Request) {
 
 	token, err := a.Login(user.Login, user.Password)
 	switch err {
-	case auth.ErrLogin:
+	case tools.ErrLogin:
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
-	case auth.ErrServer:
+	case tools.ErrServer:
 		http.Error(w, "server error", http.StatusInternalServerError)
 		return
 	}

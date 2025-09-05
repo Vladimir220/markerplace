@@ -2,7 +2,7 @@ package tools
 
 import (
 	"context"
-	"main/models"
+	"marketplace/models"
 )
 
 func CheckAuth(ctx context.Context) (user models.User, ok bool) {

@@ -1,25 +1,20 @@
-package auth
+package authentication
 
 import (
-	"errors"
+	"context"
 	"fmt"
-	"main/crypto"
-	"main/db/DAO/postgres"
-	"main/log"
+	"marketplace/crypto"
+	"marketplace/db/DAO/postgres"
+	"marketplace/log"
+	"marketplace/network/auth/tools"
 )
-
-var ErrLogin = errors.New("Incorrect password or login")
-var ErrLoginFormat = errors.New("Incorrect login format")
-var ErrPasswordFormat = errors.New("Incorrect password format")
-var ErrLoginIsTaken = errors.New("Login is taken")
-var ErrServer = errors.New("Server error")
 
 type IAuthentication interface {
 	Register(login, password string) (token string, err error)
 	Login(login, password string) (token string, err error)
 }
 
-func CreateAuthentication(tokenManager crypto.ITokenManager, infoLogs bool) (IAuthentication, error) {
+func CreateAuthentication(ctx context.Context, tokenManager crypto.ITokenManager, infoLogs bool) (IAuthentication, error) {
 	dao, err := postgres.CreateMarketplaceDAO()
 	if err != nil {
 		return nil, fmt.Errorf("CreateAuthentication():%v", err)
@@ -27,7 +22,7 @@ func CreateAuthentication(tokenManager crypto.ITokenManager, infoLogs bool) (IAu
 	return &Authentication{
 		tokenManager: tokenManager,
 		dao:          dao,
-		logger:       log.CreateLogger("Authentication"),
+		logger:       log.CreateLoggerAdapter(ctx, "Authentication"),
 		infoLogs:     infoLogs,
 	}, nil
 }
@@ -43,30 +38,30 @@ func (auth *Authentication) Register(login, password string) (token string, err 
 	logLabel := fmt.Sprintf("Register():[params:%s,%s]:", login, "***")
 	ok := auth.checkLogin(login)
 	if !ok {
-		err = ErrLoginFormat
+		err = tools.ErrLoginFormat
 		return
 	}
 
 	password, err = crypto.GetHashedPassword(password)
 	if err != nil {
 		auth.logger.WriteError(fmt.Sprintf("%s %v", logLabel, err))
-		err = ErrServer
+		err = tools.ErrServer
 		return
 	}
 
 	user, isAlreadyExist, err := auth.dao.Registr(login, password)
 	if err != nil {
-		err = ErrServer
+		err = tools.ErrServer
 		return
 	}
 	if isAlreadyExist {
-		err = ErrLoginIsTaken
+		err = tools.ErrLoginIsTaken
 		return
 	}
 
 	token, isErr := auth.tokenManager.GenerateToken(user)
 	if isErr {
-		err = ErrServer
+		err = tools.ErrServer
 		return
 	}
 
@@ -81,28 +76,28 @@ func (auth *Authentication) Login(login, password string) (token string, err err
 
 	user, realPassword, isFound, err := auth.dao.GetUser(login)
 	if !isFound {
-		err = ErrLogin
+		err = tools.ErrLogin
 		return
 	}
 	if err != nil {
-		err = ErrServer
+		err = tools.ErrServer
 		return
 	}
 
 	equal, err := crypto.ComparePassword(password, realPassword)
 	if err != nil {
 		auth.logger.WriteError(fmt.Sprintf("%s %v", logLabel, err))
-		err = ErrServer
+		err = tools.ErrServer
 		return
 	}
 	if !equal {
-		err = ErrLogin
+		err = tools.ErrLogin
 		return
 	}
 
 	token, isErr := auth.tokenManager.GenerateToken(user)
 	if isErr {
-		err = ErrServer
+		err = tools.ErrServer
 		return
 	}
 

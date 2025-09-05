@@ -3,13 +3,9 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
-	"os"
-	"path/filepath"
 	"reader_db_service/env"
+	"time"
 
-	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 )
 
@@ -29,7 +25,7 @@ func connect() (db *sql.DB, err error) {
 	return
 }
 
-func checkDbExistence() (err error) {
+func checkDbExistence(times uint, waitingTime time.Duration) (err error) {
 	logLabel := "checkDbExistence():"
 
 	data, err := env.GetPostgresEnvData()
@@ -45,55 +41,24 @@ func checkDbExistence() (err error) {
 		err = fmt.Errorf("%s %v", logLabel, err)
 		return
 	}
+	defer tempConn.Close()
 
 	query := "SELECT EXISTS (SELECT datname FROM pg_catalog.pg_database WHERE datname = $1)"
 
 	var isDbExist bool
-	err = tempConn.QueryRow(query, data.DbName).Scan(&isDbExist)
-	if err != nil {
-		err = fmt.Errorf("%s %v", logLabel, err)
-		return
-	}
-
-	if !isDbExist {
-		_, err = tempConn.Exec(fmt.Sprintf("CREATE DATABASE %s;", data.DbName))
+	for range times {
+		err = tempConn.QueryRow(query, data.DbName).Scan(&isDbExist)
 		if err != nil {
 			err = fmt.Errorf("%s %v", logLabel, err)
 			return
 		}
+		if isDbExist {
+			return
+		}
+		time.Sleep(waitingTime)
 	}
-	tempConn.Close()
+
+	err = fmt.Errorf("%s %s", logLabel, "db doesn't exist")
+
 	return
-}
-
-func CheckMigrations(connection *sql.DB) error {
-	logLabel := "checkMigrations():"
-
-	if connection == nil {
-		return fmt.Errorf("%s no connection", logLabel)
-	}
-
-	driver, err := postgres.WithInstance(connection, &postgres.Config{})
-	if err != nil {
-		return fmt.Errorf("%s checkMigrations(): %v", logLabel, err)
-	}
-
-	dbName := os.Getenv("DB_NAME")
-	var path string
-	currentDir, _ := os.Getwd()
-	path = filepath.ToSlash(currentDir)
-	if path != "" {
-		path = path + "/"
-	}
-
-	m, err := migrate.NewWithDatabaseInstance("file://"+path+"db/migrations", dbName, driver)
-	if err != nil {
-		return fmt.Errorf("%s checkMigrations(): %v", logLabel, err)
-	}
-
-	if err = m.Up(); err != nil && err != migrate.ErrNoChange {
-		return fmt.Errorf("%s checkMigrations(): %v", logLabel, err)
-	}
-
-	return nil
 }

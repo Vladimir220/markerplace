@@ -2,16 +2,23 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"reader_db_service/DAO/postgres"
 	"reader_db_service/env"
 	"reader_db_service/gen"
 	"reader_db_service/log"
 
+	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -30,6 +37,7 @@ func main() {
 	}
 
 	server := CreateServer(dao)
+	fmt.Println("я умею писать")
 
 	lis, err := net.Listen("tcp", host)
 	if err != nil {

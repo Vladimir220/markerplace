@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"encoding/json"
-	"main/models"
-	"main/network/auth/tools"
+	"marketplace/models"
+	"marketplace/network/auth/tools"
 	"net/http"
 	"time"
 )

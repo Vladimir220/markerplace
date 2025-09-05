@@ -49,7 +49,7 @@ func CheckMigrations(connection *sql.DB) error {
 		path = path + "/"
 	}
 
-	m, err := migrate.NewWithDatabaseInstance("file://"+path+"db/migrations", dbName, driver)
+	m, err := migrate.NewWithDatabaseInstance("file://"+path+"migrations", dbName, driver)
 	if err != nil {
 		return fmt.Errorf("%s checkMigrations(): %v", logLabel, err)
 	}
@@ -86,6 +86,7 @@ func CheckDbExistence() (err error) {
 		err = fmt.Errorf("%s %v", logLabel, err)
 		return
 	}
+	fmt.Println()
 
 	if !isDbExist {
 		_, err = tempConn.Exec(fmt.Sprintf("CREATE DATABASE %s;", data.DbName))

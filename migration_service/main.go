@@ -5,9 +5,15 @@ import (
 	"migration_service/log"
 
 	"github.com/golang-migrate/migrate/v4"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 

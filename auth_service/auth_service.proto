@@ -5,6 +5,7 @@ option go_package = "auth_service/gen;gen";
 
 service Auth {
     rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse);
+    rpc GenerateToken (GenerateTokenRequest) returns (GenerateTokenResponse);
     rpc Register (RegisterRequest) returns (RegisterResponse);
     rpc Login (LoginRequest) returns (LoginResponse);
 }
@@ -34,8 +35,16 @@ message ValidateTokenRequest {
 
 
 message ValidateTokenResponse {
+    string login = 1;
+    string group = 2;
+    bool isValid = 3;
+}
+
+message GenerateTokenRequest {
+    string login = 1;
+    string group = 2;
+}
+
+message GenerateTokenResponse {
     string token = 1;
-    string login = 2;
-    string group = 3;
-    bool isValid = 4;
 }

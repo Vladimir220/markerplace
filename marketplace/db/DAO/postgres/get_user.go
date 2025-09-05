@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"main/models"
+	"marketplace/models"
 )
 
 func (md MarketplaceDAO) GetUser(login string) (user models.User, password string, isFound bool, err error) {

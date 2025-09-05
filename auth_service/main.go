@@ -11,11 +11,17 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 )
 
 func main() {
 	logLabel := "main():"
+
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

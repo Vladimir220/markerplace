@@ -2,7 +2,9 @@ package env
 
 import (
 	"errors"
+	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -17,8 +19,13 @@ type PostgresEnvData struct {
 	User, Password, DbName, Host string
 }
 
+type RedisEnvData struct {
+	Host, Password string
+	DbNum          int
+}
+
 func GetKafkaEnvData() (data KafkaEnvData, err error) {
-	brokerHostsStr := os.Getenv("KAFKA_LOGGER_HOST")
+	brokerHostsStr := os.Getenv("KAFKA_BROKER_HOSTS")
 	data.InfoTopicName = os.Getenv("INFO_TOPIC_NAME")
 	data.ErrorTopicName = os.Getenv("ERROR_TOPIC_NAME")
 	data.WarningTopicName = os.Getenv("WARNING_TOPIC_NAME")
@@ -47,10 +54,31 @@ func GetPostgresEnvData() (data PostgresEnvData, err error) {
 
 func GetServiceData() (host, serviceName string, err error) {
 	host = os.Getenv("GRPC_HOST")
-	serviceName = os.Getenv("DB_PASSWORD")
+	serviceName = os.Getenv("SERVICE_NAME")
 	if host == "" || serviceName == "" {
 		err = errors.New("GetServiceData(): one of the following variables is not specified in .env: GRPC_HOST, DB_PASSWORD")
 		return
 	}
+	return
+}
+
+func GetRedisEnvData() (data RedisEnvData, err error) {
+	logLabel := "GetEnvLoginData():"
+
+	data.Host = os.Getenv("REDIS_HOST")
+	data.Password = os.Getenv("REDIS_PASSWORD")
+	dbStr := os.Getenv("REDIS_DB")
+
+	if data.Host == "" || dbStr == "" {
+		err = fmt.Errorf("%s one of the following variables is not specified in env: REDIS_HOST, REDIS_PASSWORD, REDIS_DB", logLabel)
+		return
+	}
+
+	data.DbNum, err = strconv.Atoi(dbStr)
+	if err != nil {
+		err = fmt.Errorf("%s %v", logLabel, err)
+		return
+	}
+
 	return
 }

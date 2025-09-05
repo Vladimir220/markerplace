@@ -4,10 +4,11 @@
 // - protoc             v3.20.3
 // source: reader_db_service.proto
 
-package gen
+package reader_db_service
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"

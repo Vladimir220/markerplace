@@ -7,13 +7,13 @@ import (
 )
 
 type KafkaEnvData struct {
-	loggerData struct {
+	LoggerData struct {
 		InfoTopicName    string
 		ErrorTopicName   string
 		WarningTopicName string
 	}
 
-	writerData struct {
+	WriterData struct {
 		NewAnnouncementTopicName string
 	}
 
@@ -24,14 +24,19 @@ type PostgresEnvData struct {
 	User, Password, DbName, Host string
 }
 
-func GetKafkaEnvData() (data KafkaEnvData, err error) {
-	brokerHostsStr := os.Getenv("KAFKA_LOGGER_HOST")
-	data.loggerData.InfoTopicName = os.Getenv("INFO_TOPIC_NAME")
-	data.loggerData.ErrorTopicName = os.Getenv("ERROR_TOPIC_NAME")
-	data.loggerData.WarningTopicName = os.Getenv("WARNING_TOPIC_NAME")
-	data.writerData.NewAnnouncementTopicName = os.Getenv("NEW_ANNOUNCEMENT_TOPIC_NAME")
+type ServicesData struct {
+	ReaderGRPCHost string
+	AuthGRPCHost   string
+}
 
-	if brokerHostsStr == "" || data.loggerData.InfoTopicName == "" || data.loggerData.ErrorTopicName == "" || data.loggerData.WarningTopicName == "" || data.writerData.NewAnnouncementTopicName == "" {
+func GetKafkaEnvData() (data KafkaEnvData, err error) {
+	brokerHostsStr := os.Getenv("KAFKA_BROKER_HOSTS")
+	data.LoggerData.InfoTopicName = os.Getenv("INFO_TOPIC_NAME")
+	data.LoggerData.ErrorTopicName = os.Getenv("ERROR_TOPIC_NAME")
+	data.LoggerData.WarningTopicName = os.Getenv("WARNING_TOPIC_NAME")
+	data.WriterData.NewAnnouncementTopicName = os.Getenv("NEW_ANNOUNCEMENT_TOPIC_NAME")
+
+	if brokerHostsStr == "" || data.LoggerData.InfoTopicName == "" || data.LoggerData.ErrorTopicName == "" || data.LoggerData.WarningTopicName == "" || data.WriterData.NewAnnouncementTopicName == "" {
 		err = errors.New("GetKafkaEnvData(): one of the following variables is not specified in .env: KAFKA_BROKER_HOSTS, INFO_TOPIC_NAME, ERROR_TOPIC_NAME, WARNING_TOPIC_NAME, NEW_ANNOUNCEMENT_TOPIC_NAME")
 		return
 	}
@@ -54,11 +59,23 @@ func GetPostgresEnvData() (data PostgresEnvData, err error) {
 }
 
 func GetServiceData() (host, serviceName string, err error) {
-	host = os.Getenv("GRPC_HOST")
-	serviceName = os.Getenv("DB_PASSWORD")
+	host = os.Getenv("HOST")
+	serviceName = os.Getenv("SERVICE_NAME")
 	if host == "" || serviceName == "" {
 		err = errors.New("GetServiceData(): one of the following variables is not specified in .env: GRPC_HOST, DB_PASSWORD")
 		return
 	}
+	return
+}
+
+func GetServicesData() (data ServicesData, err error) {
+	data.AuthGRPCHost = os.Getenv("AUTH_SERVICE_GRPC_HOST")
+	data.ReaderGRPCHost = os.Getenv("READER_SERVICE_GRPC_HOST")
+
+	if data.AuthGRPCHost == "" || data.ReaderGRPCHost == "" {
+		err = errors.New("GetServicesData(): one of the following variables is not specified in .env: AUTH_SERVICE_GRPC_HOST, READER_SERVICE_GRPC_HOST")
+		return
+	}
+
 	return
 }

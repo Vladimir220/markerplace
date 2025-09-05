@@ -1,10 +1,11 @@
 package crypto
 
 import (
+	"context"
 	"fmt"
-	"main/db/DAO"
-	"main/log"
-	"main/models"
+	"marketplace/db/DAO"
+	"marketplace/log"
+	"marketplace/models"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -19,10 +20,10 @@ type ITokenManager interface {
 	ValidateToken(token string) (user models.User, isValid, isErr bool)
 }
 
-func CreateTokenManager(tokensDAO DAO.ITokensDAO, infoLogs bool) ITokenManager {
+func CreateTokenManager(ctx context.Context, tokensDAO DAO.ITokensDAO, infoLogs bool) ITokenManager {
 	return &TokenManager{
 		tokensDAO: tokensDAO,
-		logger:    log.CreateLogger("TokenManager"),
+		logger:    log.CreateLoggerAdapter(ctx, "TokenManager"),
 		infoLogs:  infoLogs,
 	}
 }

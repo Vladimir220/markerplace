@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"main/models"
+	"marketplace/models"
 )
 
 func (md MarketplaceDAO) Registr(login, password string) (user models.User, isAlreadyExist bool, err error) {

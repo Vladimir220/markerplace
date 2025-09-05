@@ -3,10 +3,8 @@ services:
     image: postgres
     environment:
       POSTGRES_PASSWORD: qwerty
-
-
     ports:
-      - '5432:5432'
+      - '5433:5432'
   
   redis:
     image: redis
@@ -16,12 +14,15 @@ services:
   kafka:
     image: bitnami/kafka:4.0.0
     environment:
-    - KAFKA_CFG_NODE_ID=0
-    - KAFKA_CFG_PROCESS_ROLES=controller,broker
-    - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
-    - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-    - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
-    - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      KAFKA_CFG_NODE_ID: 0
+      KAFKA_CFG_PROCESS_ROLES: controller,broker 
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+    volumes:
+      - .\kafka_migration\:/migration/
+    command: "/migration/kafka_migration.sh;"
     ports:
       - '9092:9092'
       - '9093:9093'
@@ -29,8 +30,6 @@ services:
   logger_service:
     build:
       dockerfile: ./logger_service/.Dockerfile
-    ports:
-      - "1234:1234"
     volumes:
       - .\logger_service\:/app/
     depends_on:

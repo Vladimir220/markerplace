@@ -1,16 +1,17 @@
 package proxies
 
 import (
+	"context"
 	"fmt"
-	"main/db/DAO/postgres"
-	"main/log"
-	"main/models"
+	"marketplace/db/DAO/postgres"
+	"marketplace/log"
+	"marketplace/models"
 )
 
-func CreateDAOWithLog(dao postgres.IMarketplaceDAO, infoLogs bool) postgres.IMarketplaceDAO {
+func CreateDAOWithLog(ctx context.Context, dao postgres.IMarketplaceDAO, infoLogs bool) postgres.IMarketplaceDAO {
 	return &DAOWithLog{
 		original: dao,
-		logger:   log.CreateLogger("IMarketplaceDAO"),
+		logger:   log.CreateLoggerAdapter(ctx, "IMarketplaceDAO"),
 		infoLogs: infoLogs,
 	}
 }

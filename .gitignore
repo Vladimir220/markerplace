@@ -1,1 +1,2 @@
-marketplace/log/output/*.log
+*/logs/*.log
+*/go.sum

@@ -1,22 +1,23 @@
 package middleware
 
 import (
-	"main/crypto"
-	"main/network/auth"
+	"context"
+	"marketplace/crypto"
+	"marketplace/network/auth/authorization"
 	"net/http"
 	"time"
 )
 
 const cookieFieldName = "auth-cookie"
 
-func CreateAuthorizationMiddleware(tokenManager crypto.ITokenManager, infoLogs bool) IMiddleware {
+func CreateAuthorizationMiddleware(ctx context.Context, tokenManager crypto.ITokenManager, infoLogs bool) IMiddleware {
 	return &AuthorizationMiddleware{
-		authorization: auth.CreateAuthorization(tokenManager, infoLogs),
+		authorization: authorization.CreateAuthorization(ctx, tokenManager, infoLogs),
 	}
 }
 
 type AuthorizationMiddleware struct {
-	authorization auth.IAuthorization
+	authorization authorization.IAuthorization
 	next          http.Handler
 }
 

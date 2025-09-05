@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 	"writer_db_service/DAO/postgres"
 	"writer_db_service/log"
@@ -58,6 +59,8 @@ func KafkaWorker(ctx context.Context, reader *kafka.Reader, mod int) {
 			time.Sleep(time.Second)
 			continue
 		}
+
+		fmt.Println("я отработал")
 
 		var announcement models.ExtendedAnnouncement
 		err = json.Unmarshal([]byte(msg.Value), &announcement)
