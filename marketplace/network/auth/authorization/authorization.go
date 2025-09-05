@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 	"marketplace/crypto"
-	"marketplace/log"
+
+	"github.com/Vladimir220/markerplace/logger_lib"
 )
 
 type IAuthorization interface {
@@ -14,14 +15,14 @@ type IAuthorization interface {
 func CreateAuthorization(ctx context.Context, tokenManager crypto.ITokenManager, infoLogs bool) IAuthorization {
 	return &Authorization{
 		tokenManager: tokenManager,
-		logger:       log.CreateLoggerAdapter(ctx, "Authorization"),
+		logger:       logger_lib.CreateLoggerAdapter(ctx, "Authorization"),
 		infoLogs:     infoLogs,
 	}
 }
 
 type Authorization struct {
 	tokenManager crypto.ITokenManager
-	logger       log.ILogger
+	logger       logger_lib.ILogger
 	infoLogs     bool
 }
 

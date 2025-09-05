@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"migration_service/log"
 
+	"github.com/Vladimir220/markerplace/logger_lib"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/joho/godotenv"
 )
@@ -17,7 +17,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	logger := log.CreateLoggerAdapter(ctx, "main()")
+	logger := logger_lib.CreateLoggerAdapter(ctx, "main()")
 
 	connection, err := Connect()
 	if err != nil {

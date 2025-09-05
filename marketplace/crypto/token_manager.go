@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"marketplace/db/DAO"
-	"marketplace/log"
 	"marketplace/models"
 	"time"
 
+	"github.com/Vladimir220/markerplace/logger_lib"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
@@ -23,14 +23,14 @@ type ITokenManager interface {
 func CreateTokenManager(ctx context.Context, tokensDAO DAO.ITokensDAO, infoLogs bool) ITokenManager {
 	return &TokenManager{
 		tokensDAO: tokensDAO,
-		logger:    log.CreateLoggerAdapter(ctx, "TokenManager"),
+		logger:    logger_lib.CreateLoggerAdapter(ctx, "TokenManager"),
 		infoLogs:  infoLogs,
 	}
 }
 
 type TokenManager struct {
 	tokensDAO DAO.ITokensDAO
-	logger    log.ILogger
+	logger    logger_lib.ILogger
 	infoLogs  bool
 }
 

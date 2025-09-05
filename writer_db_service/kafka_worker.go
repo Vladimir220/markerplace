@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"time"
 	"writer_db_service/DAO/postgres"
-	"writer_db_service/log"
 	"writer_db_service/models"
 
+	"github.com/Vladimir220/markerplace/logger_lib"
 	"github.com/segmentio/kafka-go"
 )
 
@@ -38,7 +38,7 @@ func RunKafkaWorkers(ctx context.Context, config WorkersConfig) {
 }
 
 func KafkaWorker(ctx context.Context, reader *kafka.Reader, mod int) {
-	logger := log.CreateLoggerAdapter(ctx, "KafkaWorker()")
+	logger := logger_lib.CreateLoggerAdapter(ctx, "KafkaWorker()")
 	defer reader.Close()
 	dao, err := postgres.CreateMarketplaceDAO()
 	if err != nil {

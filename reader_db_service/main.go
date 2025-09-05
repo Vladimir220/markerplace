@@ -7,8 +7,8 @@ import (
 	"reader_db_service/DAO/postgres"
 	"reader_db_service/env"
 	"reader_db_service/gen"
-	"reader_db_service/log"
 
+	"github.com/Vladimir220/markerplace/logger_lib"
 	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 )
@@ -22,7 +22,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	logger := log.CreateLoggerAdapter(ctx, "main()")
+	logger := logger_lib.CreateLoggerAdapter(ctx, "main()")
 
 	host, _, err := env.GetServiceData()
 	if err != nil {

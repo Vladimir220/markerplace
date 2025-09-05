@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 	"marketplace/db/DAO"
-	"marketplace/log"
 	"marketplace/models"
+
+	"github.com/Vladimir220/markerplace/logger_lib"
 )
 
 func CreateTokenManagerProxy(ctx context.Context, tokensDAO DAO.ITokensDAO, infoLogs bool) (tokenManager ITokenManager) {
-	logger := log.CreateLoggerAdapter(ctx, "TokenManagerProxy")
+	logger := logger_lib.CreateLoggerAdapter(ctx, "TokenManagerProxy")
 
 	grpcTokenManager, err := CreateGrpcTokenManager(ctx)
 	var remoteUnavailable bool
@@ -36,7 +37,7 @@ type TokenManagerProxy struct {
 	localTokenManager  ITokenManager
 	remoteTokenManager ITokenManager
 	ctx                context.Context
-	logger             log.ILogger
+	logger             logger_lib.ILogger
 }
 
 func (tm TokenManagerProxy) GenerateToken(user models.User) (token string, isErr bool) {

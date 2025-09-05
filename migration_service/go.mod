@@ -3,6 +3,7 @@ module migration_service
 go 1.24.0
 
 require (
+	github.com/Vladimir220/markerplace/logger_lib v0.0.0-20250905122048-8a4fc5655408
 	github.com/golang-migrate/migrate/v4 v4.18.3
 	github.com/lib/pq v1.10.9
 )

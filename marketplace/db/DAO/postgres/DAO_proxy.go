@@ -4,13 +4,14 @@ import (
 	"context"
 	"fmt"
 	"marketplace/db/DAO/postgres/remote"
-	"marketplace/log"
 	"marketplace/models"
+
+	"github.com/Vladimir220/markerplace/logger_lib"
 )
 
 func CreateDAOProxy(ctx context.Context) (dao IMarketplaceDAO, err error) {
 	logLabel := "CreateDAOProxy():"
-	logger := log.CreateLoggerAdapter(ctx, "DAOProxy")
+	logger := logger_lib.CreateLoggerAdapter(ctx, "DAOProxy")
 
 	grpcRemoteReader, err := remote.CreateGrpcReader(ctx)
 	var remoteReaderUnavailable bool
@@ -52,7 +53,7 @@ type DAOProxy struct {
 	remoteReader            remote.IReader
 	remoteWriter            remote.IWriter
 	ctx                     context.Context
-	logger                  log.ILogger
+	logger                  logger_lib.ILogger
 }
 
 func (dao DAOProxy) GetAnnouncements(orderType *string, minPrice, maxPrice *uint, page uint) (announcement models.Announcements, err error) {

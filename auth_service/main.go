@@ -5,12 +5,12 @@ import (
 	"auth_service/db/DAO/redis"
 	"auth_service/env"
 	"auth_service/gen"
-	"auth_service/log"
 	"auth_service/network/auth"
 	"context"
 	"fmt"
 	"net"
 
+	"github.com/Vladimir220/markerplace/logger_lib"
 	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 )
@@ -26,7 +26,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	logger := log.CreateLoggerAdapter(ctx, "main()")
+	logger := logger_lib.CreateLoggerAdapter(ctx, "main()")
 
 	host, _, err := env.GetServiceData()
 	if err != nil {

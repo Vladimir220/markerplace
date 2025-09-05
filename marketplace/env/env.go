@@ -7,12 +7,6 @@ import (
 )
 
 type KafkaEnvData struct {
-	LoggerData struct {
-		InfoTopicName    string
-		ErrorTopicName   string
-		WarningTopicName string
-	}
-
 	WriterData struct {
 		NewAnnouncementTopicName string
 	}
@@ -31,13 +25,10 @@ type ServicesData struct {
 
 func GetKafkaEnvData() (data KafkaEnvData, err error) {
 	brokerHostsStr := os.Getenv("KAFKA_BROKER_HOSTS")
-	data.LoggerData.InfoTopicName = os.Getenv("INFO_TOPIC_NAME")
-	data.LoggerData.ErrorTopicName = os.Getenv("ERROR_TOPIC_NAME")
-	data.LoggerData.WarningTopicName = os.Getenv("WARNING_TOPIC_NAME")
 	data.WriterData.NewAnnouncementTopicName = os.Getenv("NEW_ANNOUNCEMENT_TOPIC_NAME")
 
-	if brokerHostsStr == "" || data.LoggerData.InfoTopicName == "" || data.LoggerData.ErrorTopicName == "" || data.LoggerData.WarningTopicName == "" || data.WriterData.NewAnnouncementTopicName == "" {
-		err = errors.New("GetKafkaEnvData(): one of the following variables is not specified in .env: KAFKA_BROKER_HOSTS, INFO_TOPIC_NAME, ERROR_TOPIC_NAME, WARNING_TOPIC_NAME, NEW_ANNOUNCEMENT_TOPIC_NAME")
+	if brokerHostsStr == "" || data.WriterData.NewAnnouncementTopicName == "" {
+		err = errors.New("GetKafkaEnvData(): one of the following variables is not specified in .env: KAFKA_BROKER_HOSTS, NEW_ANNOUNCEMENT_TOPIC_NAME")
 		return
 	}
 

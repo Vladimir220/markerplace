@@ -2,12 +2,12 @@ package crypto
 
 import (
 	"auth_service/db/DAO"
-	"auth_service/log"
 	"auth_service/models"
 	"context"
 	"fmt"
 	"time"
 
+	"github.com/Vladimir220/markerplace/logger_lib"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
@@ -23,14 +23,14 @@ type ITokenManager interface {
 func CreateTokenManager(ctx context.Context, tokensDAO DAO.ITokensDAO, infoLogs bool) ITokenManager {
 	return &TokenManager{
 		tokensDAO: tokensDAO,
-		logger:    log.CreateLoggerAdapter(ctx, "TokenManager"),
+		logger:    logger_lib.CreateLoggerAdapter(ctx, "TokenManager"),
 		infoLogs:  infoLogs,
 	}
 }
 
 type TokenManager struct {
 	tokensDAO DAO.ITokensDAO
-	logger    log.ILogger
+	logger    logger_lib.ILogger
 	infoLogs  bool
 }
 

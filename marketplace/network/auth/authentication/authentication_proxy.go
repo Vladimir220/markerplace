@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 	"marketplace/crypto"
-	"marketplace/log"
 	"marketplace/network/auth/tools"
+
+	"github.com/Vladimir220/markerplace/logger_lib"
 )
 
 func CreateAuthenticationProxy(ctx context.Context, localTokenManager crypto.ITokenManager, infoLogs bool) (auth IAuthentication, err error) {
-	logger := log.CreateLoggerAdapter(ctx, "AuthenticationProxy")
+	logger := logger_lib.CreateLoggerAdapter(ctx, "AuthenticationProxy")
 
 	grpcAuth, err := CreateGrpcAuthentication(ctx)
 	var remoteUnavailable bool
@@ -40,7 +41,7 @@ type AuthenticationProxy struct {
 	localAuth         IAuthentication
 	remoteAuth        IAuthentication
 	ctx               context.Context
-	logger            log.ILogger
+	logger            logger_lib.ILogger
 }
 
 func (auth AuthenticationProxy) Register(login, password string) (token string, err error) {

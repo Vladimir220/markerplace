@@ -3,6 +3,7 @@ module writer_db_service
 go 1.24.5
 
 require (
+	github.com/Vladimir220/markerplace/logger_lib v0.0.0-20250905122048-8a4fc5655408
 	github.com/lib/pq v1.10.9
 	github.com/segmentio/kafka-go v0.4.49
 )

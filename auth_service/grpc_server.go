@@ -3,16 +3,17 @@ package main
 import (
 	"auth_service/crypto"
 	"auth_service/gen"
-	"auth_service/log"
 	"auth_service/models"
 	"auth_service/network/auth"
 	"context"
 	"fmt"
+
+	"github.com/Vladimir220/markerplace/logger_lib"
 )
 
 func CreateServer(ctx context.Context, auth auth.IAuthentication, tokenManager crypto.ITokenManager) (server gen.AuthServer) {
 	server = Server{
-		logger:       log.CreateLoggerAdapter(ctx, "Server"),
+		logger:       logger_lib.CreateLoggerAdapter(ctx, "Server"),
 		auth:         auth,
 		tokenManager: tokenManager,
 	}
@@ -21,7 +22,7 @@ func CreateServer(ctx context.Context, auth auth.IAuthentication, tokenManager c
 
 type Server struct {
 	gen.UnimplementedAuthServer
-	logger       log.ILogger
+	logger       logger_lib.ILogger
 	auth         auth.IAuthentication
 	tokenManager crypto.ITokenManager
 }

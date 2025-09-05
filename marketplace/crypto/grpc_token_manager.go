@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"marketplace/env"
 	"marketplace/gen/auth_service"
-	"marketplace/log"
 	"marketplace/models"
 
+	"github.com/Vladimir220/markerplace/logger_lib"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -28,7 +28,7 @@ func CreateGrpcTokenManager(ctx context.Context) (tokenManager ITokenManager, er
 
 	tokenManager = &GrpcTokenManager{
 		host:   data.AuthGRPCHost,
-		logger: log.CreateLoggerAdapter(ctx, "GrpcTokenManager"),
+		logger: logger_lib.CreateLoggerAdapter(ctx, "GrpcTokenManager"),
 		ctx:    ctx,
 	}
 
@@ -38,7 +38,7 @@ func CreateGrpcTokenManager(ctx context.Context) (tokenManager ITokenManager, er
 type GrpcTokenManager struct {
 	host   string
 	ctx    context.Context
-	logger log.ILogger
+	logger logger_lib.ILogger
 }
 
 func (tm GrpcTokenManager) ValidateToken(token string) (user models.User, isValid, isErr bool) {

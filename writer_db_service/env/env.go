@@ -10,9 +10,6 @@ import (
 
 type KafkaEnvData struct {
 	NewAnnouncementTopicName string
-	InfoTopicName            string
-	ErrorTopicName           string
-	WarningTopicName         string
 	BrokerHosts              []string
 	NumOfWorkers             uint
 	GroupId                  string
@@ -29,12 +26,9 @@ func GetKafkaEnvData() (data KafkaEnvData, err error) {
 	countStr := os.Getenv("NUM_OF_WORKERS_FOR_EACH_TOPIC")
 	data.GroupId = os.Getenv("GROUP_ID_FOR_ALL_TOPICS")
 	data.NewAnnouncementTopicName = os.Getenv("NEW_ANNOUNCEMENT_TOPIC_NAME")
-	data.InfoTopicName = os.Getenv("INFO_TOPIC_NAME")
-	data.ErrorTopicName = os.Getenv("ERROR_TOPIC_NAME")
-	data.WarningTopicName = os.Getenv("WARNING_TOPIC_NAME")
 
-	if brokerHostsStr == "" || countStr == "" || data.GroupId == "" || data.NewAnnouncementTopicName == "" || data.InfoTopicName == "" || data.ErrorTopicName == "" || data.WarningTopicName == "" {
-		err = errors.New("GetKafkaEnvData(): one of the following variables is not specified in .env: KAFKA_BROKER_HOSTS, NUM_OF_WORKERS_FOR_EACH_TOPIC, GROUP_ID_FOR_ALL_TOPICS, NEW_ANNOUNCEMENT_TOPIC_NAME, INFO_TOPIC_NAME, ERROR_TOPIC_NAME, WARNING_TOPIC_NAME")
+	if brokerHostsStr == "" || countStr == "" || data.GroupId == "" || data.NewAnnouncementTopicName == "" {
+		err = errors.New("GetKafkaEnvData(): one of the following variables is not specified in .env: KAFKA_BROKER_HOSTS, NUM_OF_WORKERS_FOR_EACH_TOPIC, GROUP_ID_FOR_ALL_TOPICS, NEW_ANNOUNCEMENT_TOPIC_NAME")
 		return
 	}
 

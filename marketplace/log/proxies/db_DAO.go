@@ -4,21 +4,22 @@ import (
 	"context"
 	"fmt"
 	"marketplace/db/DAO/postgres"
-	"marketplace/log"
 	"marketplace/models"
+
+	"github.com/Vladimir220/markerplace/logger_lib"
 )
 
 func CreateDAOWithLog(ctx context.Context, dao postgres.IMarketplaceDAO, infoLogs bool) postgres.IMarketplaceDAO {
 	return &DAOWithLog{
 		original: dao,
-		logger:   log.CreateLoggerAdapter(ctx, "IMarketplaceDAO"),
+		logger:   logger_lib.CreateLoggerAdapter(ctx, "IMarketplaceDAO"),
 		infoLogs: infoLogs,
 	}
 }
 
 type DAOWithLog struct {
 	original postgres.IMarketplaceDAO
-	logger   log.ILogger
+	logger   logger_lib.ILogger
 	infoLogs bool
 }
 
