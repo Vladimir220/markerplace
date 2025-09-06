@@ -5,6 +5,7 @@ import (
 	"auth_service/db/DAO/redis"
 	"auth_service/env"
 	"auth_service/gen"
+	"auth_service/network"
 	"auth_service/network/auth"
 	"context"
 	"fmt"
@@ -33,6 +34,8 @@ func main() {
 		logger.WriteError(err.Error())
 		panic(err)
 	}
+
+	go network.HealthListener()
 
 	tokensDao, err := redis.CreateTokensDAO()
 	if err != nil {

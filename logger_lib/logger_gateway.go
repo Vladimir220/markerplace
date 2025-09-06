@@ -5,31 +5,45 @@ import (
 	"fmt"
 )
 
-func CreateLoggerAdapter(ctx context.Context, parentName string) ILogger {
+type LoggerGatewayConfig struct {
+	printErrorsToStdOut   bool
+	printWarningsToStdOut bool
+	printInfoToStdOut     bool
+}
+
+func CreateLoggerGateway(ctx context.Context, parentName string, config LoggerGatewayConfig) ILogger {
 	remoteLogger, err := CreateKafkaLogger(ctx, parentName)
 	localLogger := CreateLocalLogger(parentName)
 	var remoteUnavailable bool
 	if err != nil {
-		localLogger.WriteWarning(fmt.Sprintf("%s: %v", "CreateLoggerAdapter(): remote logger unavailable", err))
+		localLogger.WriteWarning(fmt.Sprintf("%s: %v", "CreateLoggerGateway(): remote logger unavailable", err))
 		remoteUnavailable = true
 	}
 
-	return &LoggerAdapter{
+	return &LoggerGateway{
 		remoteUnavailable: remoteUnavailable,
 		localLogger:       localLogger,
 		remoteLogger:      remoteLogger,
 		ctx:               ctx,
+		config:            config,
 	}
 }
 
-type LoggerAdapter struct {
+// Proxy for ILogger
+// Adapter for ILoggerRemote
+type LoggerGateway struct {
 	remoteUnavailable bool
+	config            LoggerGatewayConfig
 	localLogger       ILogger
 	remoteLogger      ILoggerRemote
 	ctx               context.Context
 }
 
-func (l LoggerAdapter) WriteWarning(msg string) {
+func (l LoggerGateway) WriteWarning(msg string) {
+	if l.config.printWarningsToStdOut {
+		fmt.Println(msg)
+	}
+
 	var err error
 	if !l.remoteUnavailable {
 		err = l.remoteLogger.WriteWarning(msg)
@@ -40,7 +54,11 @@ func (l LoggerAdapter) WriteWarning(msg string) {
 	}
 }
 
-func (l LoggerAdapter) WriteError(msg string) {
+func (l LoggerGateway) WriteError(msg string) {
+	if l.config.printErrorsToStdOut {
+		fmt.Println(msg)
+	}
+
 	var err error
 	if !l.remoteUnavailable {
 		err = l.remoteLogger.WriteError(msg)
@@ -51,7 +69,11 @@ func (l LoggerAdapter) WriteError(msg string) {
 	}
 }
 
-func (l LoggerAdapter) WriteInfo(msg string) {
+func (l LoggerGateway) WriteInfo(msg string) {
+	if l.config.printInfoToStdOut {
+		fmt.Println(msg)
+	}
+
 	var err error
 	if !l.remoteUnavailable {
 		err = l.remoteLogger.WriteInfo(msg)

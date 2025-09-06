@@ -9,7 +9,6 @@ import (
 	"github.com/segmentio/kafka-go"
 )
 
-// For LoggerAdapter
 func CreateKafkaLogger(ctx context.Context, parentName string) (logger ILoggerRemote, err error) {
 	data, err := GetKafkaEnvData()
 

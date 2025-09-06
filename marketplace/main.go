@@ -55,5 +55,7 @@ func main() {
 	authMiddleware := middleware.CreateAuthorizationMiddleware(ctx, tm, true)
 	authMiddleware.SetNext(routerPaths)
 
+	go handlers.HealthListener()
+
 	http.ListenAndServe(host, authMiddleware)
 }

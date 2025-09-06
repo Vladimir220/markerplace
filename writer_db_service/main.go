@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -31,6 +32,9 @@ func main() {
 		mod:         ModNewAnnouncement,
 		groupId:     kafkaKonfig.GroupId,
 	})
+
+	fmt.Println("еее, здоровье!")
+	go HealthListener()
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT, syscall.SIGKILL)
 	defer stop()

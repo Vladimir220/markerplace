@@ -30,6 +30,8 @@ func main() {
 		panic(err)
 	}
 
+	go HealthListener()
+
 	dao, err := postgres.CreateMarketplaceDAO()
 	if err != nil {
 		logger.WriteError(err.Error())
