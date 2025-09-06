@@ -6,9 +6,9 @@ import (
 )
 
 type LoggerGatewayConfig struct {
-	printErrorsToStdOut   bool
-	printWarningsToStdOut bool
-	printInfoToStdOut     bool
+	PrintErrorsToStdOut   bool
+	PrintWarningsToStdOut bool
+	PrintInfoToStdOut     bool
 }
 
 func CreateLoggerGateway(ctx context.Context, parentName string, config LoggerGatewayConfig) ILogger {

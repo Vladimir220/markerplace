@@ -11,9 +11,13 @@ import (
 	"github.com/Vladimir220/markerplace/logger_lib"
 )
 
-func CreateServer(ctx context.Context, auth auth.IAuthentication, tokenManager crypto.ITokenManager) (server gen.AuthServer) {
+func CreateServer(ctx context.Context, auth auth.IAuthentication, tokenManager crypto.ITokenManager, logsConfig models.LogsConfig) (server gen.AuthServer) {
 	server = Server{
-		logger:       logger_lib.CreateLoggerAdapter(ctx, "Server"),
+		logger: logger_lib.CreateLoggerGateway(ctx, "Server", logger_lib.LoggerGatewayConfig{
+			printErrorsToStdOut:   logsConfig.PrintErrorsToStdOut,
+			printWarningsToStdOut: logsConfig.PrintWarningsToStdOut,
+			printInfoToStdOut:     logsConfig.PrintInfoToStdOut,
+		}),
 		auth:         auth,
 		tokenManager: tokenManager,
 	}

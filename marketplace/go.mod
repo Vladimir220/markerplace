@@ -26,7 +26,7 @@ require (
 )
 
 require (
-	github.com/Vladimir220/markerplace/logger_lib v0.0.0-20250905122048-8a4fc5655408
+	github.com/Vladimir220/markerplace/logger_lib v0.0.0-20250906152542-4b71d3d75230
 	github.com/joho/godotenv v1.5.1
 	github.com/redis/go-redis/v9 v9.12.1
 )
