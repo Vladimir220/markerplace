@@ -3,6 +3,7 @@ package auth
 import (
 	"auth_service/crypto"
 	"auth_service/db/DAO/postgres"
+	"auth_service/models"
 	"context"
 	"errors"
 	"fmt"
@@ -21,7 +22,7 @@ type IAuthentication interface {
 	Login(login, password string) (token string, err error)
 }
 
-func CreateAuthentication(ctx context.Context, tokenManager crypto.ITokenManager, infoLogs bool) (IAuthentication, error) {
+func CreateAuthentication(ctx context.Context, tokenManager crypto.ITokenManager, logsConfig models.LogsConfig) (IAuthentication, error) {
 	dao, err := postgres.CreateMarketplaceDAO()
 	if err != nil {
 		return nil, fmt.Errorf("CreateAuthentication():%v", err)
@@ -29,8 +30,12 @@ func CreateAuthentication(ctx context.Context, tokenManager crypto.ITokenManager
 	return &Authentication{
 		tokenManager: tokenManager,
 		dao:          dao,
-		logger:       logger_lib.CreateLoggerAdapter(ctx, "Authentication"),
-		infoLogs:     infoLogs,
+		logger: logger_lib.CreateLoggerGateway(ctx, "Authentication", logger_lib.LoggerGatewayConfig{
+			PrintErrorsToStdOut:   logsConfig.PrintErrorsToStdOut,
+			PrintWarningsToStdOut: logsConfig.PrintWarningsToStdOut,
+			PrintInfoToStdOut:     logsConfig.PrintInfoToStdOut,
+		}),
+		infoLogs: logsConfig.InfoLogs,
 	}, nil
 }
 

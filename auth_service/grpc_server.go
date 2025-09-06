@@ -14,9 +14,9 @@ import (
 func CreateServer(ctx context.Context, auth auth.IAuthentication, tokenManager crypto.ITokenManager, logsConfig models.LogsConfig) (server gen.AuthServer) {
 	server = Server{
 		logger: logger_lib.CreateLoggerGateway(ctx, "Server", logger_lib.LoggerGatewayConfig{
-			printErrorsToStdOut:   logsConfig.PrintErrorsToStdOut,
-			printWarningsToStdOut: logsConfig.PrintWarningsToStdOut,
-			printInfoToStdOut:     logsConfig.PrintInfoToStdOut,
+			PrintErrorsToStdOut:   logsConfig.PrintErrorsToStdOut,
+			PrintWarningsToStdOut: logsConfig.PrintWarningsToStdOut,
+			PrintInfoToStdOut:     logsConfig.PrintInfoToStdOut,
 		}),
 		auth:         auth,
 		tokenManager: tokenManager,

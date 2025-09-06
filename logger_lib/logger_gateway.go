@@ -5,13 +5,7 @@ import (
 	"fmt"
 )
 
-type LoggerGatewayConfig struct {
-	PrintErrorsToStdOut   bool
-	PrintWarningsToStdOut bool
-	PrintInfoToStdOut     bool
-}
-
-func CreateLoggerGateway(ctx context.Context, parentName string, config LoggerGatewayConfig) ILogger {
+func CreateLoggerGateway(ctx context.Context, parentName string) ILogger {
 	remoteLogger, err := CreateKafkaLogger(ctx, parentName)
 	localLogger := CreateLocalLogger(parentName)
 	var remoteUnavailable bool
@@ -19,6 +13,8 @@ func CreateLoggerGateway(ctx context.Context, parentName string, config LoggerGa
 		localLogger.WriteWarning(fmt.Sprintf("%s: %v", "CreateLoggerGateway(): remote logger unavailable", err))
 		remoteUnavailable = true
 	}
+
+	config := GetLoggerConfig()
 
 	return &LoggerGateway{
 		remoteUnavailable: remoteUnavailable,
@@ -33,14 +29,14 @@ func CreateLoggerGateway(ctx context.Context, parentName string, config LoggerGa
 // Adapter for ILoggerRemote
 type LoggerGateway struct {
 	remoteUnavailable bool
-	config            LoggerGatewayConfig
+	config            LoggerConfig
 	localLogger       ILogger
 	remoteLogger      ILoggerRemote
 	ctx               context.Context
 }
 
 func (l LoggerGateway) WriteWarning(msg string) {
-	if l.config.printWarningsToStdOut {
+	if l.config.WarningsToStdOut {
 		fmt.Println(msg)
 	}
 
@@ -55,7 +51,7 @@ func (l LoggerGateway) WriteWarning(msg string) {
 }
 
 func (l LoggerGateway) WriteError(msg string) {
-	if l.config.printErrorsToStdOut {
+	if l.config.ErrorsToStdOut {
 		fmt.Println(msg)
 	}
 
@@ -70,7 +66,7 @@ func (l LoggerGateway) WriteError(msg string) {
 }
 
 func (l LoggerGateway) WriteInfo(msg string) {
-	if l.config.printInfoToStdOut {
+	if l.config.InfoToStdOut {
 		fmt.Println(msg)
 	}
 

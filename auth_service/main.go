@@ -28,7 +28,13 @@ func main() {
 
 	defer cancel()
 
-	logger := logger_lib.CreateLoggerAdapter(ctx, "main()")
+	logsConfig := logger_lib.LoggerGatewayConfig{
+		PrintErrorsToStdOut:   true,
+		PrintWarningsToStdOut: true,
+		PrintInfoToStdOut:     true,
+	}
+
+	logger := logger_lib.CreateLoggerGateway(ctx, "main()")
 
 	host, _, err := env.GetServiceData()
 	if err != nil {

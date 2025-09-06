@@ -20,11 +20,15 @@ type ITokenManager interface {
 	ValidateToken(token string) (user models.User, isValid, isErr bool)
 }
 
-func CreateTokenManager(ctx context.Context, tokensDAO DAO.ITokensDAO, infoLogs bool) ITokenManager {
+func CreateTokenManager(ctx context.Context, tokensDAO DAO.ITokensDAO, logsConfig models.LogsConfig) ITokenManager {
 	return &TokenManager{
 		tokensDAO: tokensDAO,
-		logger:    logger_lib.CreateLoggerAdapter(ctx, "TokenManager"),
-		infoLogs:  infoLogs,
+		logger: logger_lib.CreateLoggerGateway(ctx, "TokenManager", logger_lib.LoggerGatewayConfig{
+			PrintErrorsToStdOut:   logsConfig.PrintErrorsToStdOut,
+			PrintWarningsToStdOut: logsConfig.PrintWarningsToStdOut,
+			PrintInfoToStdOut:     logsConfig.PrintInfoToStdOut,
+		}),
+		infoLogs: logsConfig.InfoLogs,
 	}
 }
 

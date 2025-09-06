@@ -13,6 +13,41 @@ type KafkaEnvData struct {
 	BrokerHosts      []string
 }
 
+type LoggerConfig struct {
+	ErrorsToStdOut   bool
+	WarningsToStdOut bool
+	InfoToStdOut     bool
+}
+
+func GetLoggerConfig() (data LoggerConfig) {
+	printErrorsToStdOutStr := os.Getenv("PRINT_ERRORS_TO_STD_OUT")
+	printWarningsToStdStr := os.Getenv("PRINT_WARNINGS_TO_STD_OUT")
+	printInfoToStdOutStr := os.Getenv("PRINT_INFO_TO_STD_OUT")
+
+	if printErrorsToStdOutStr != "" {
+		printErrorsToStdOutStr = strings.ToUpper(printErrorsToStdOutStr)
+		if printErrorsToStdOutStr == "TRUE" {
+			data.ErrorsToStdOut = true
+		}
+	}
+
+	if printWarningsToStdStr != "" {
+		printWarningsToStdStr = strings.ToUpper(printWarningsToStdStr)
+		if printWarningsToStdStr == "TRUE" {
+			data.WarningsToStdOut = true
+		}
+	}
+
+	if printInfoToStdOutStr != "" {
+		printInfoToStdOutStr = strings.ToUpper(printInfoToStdOutStr)
+		if printInfoToStdOutStr == "TRUE" {
+			data.InfoToStdOut = true
+		}
+	}
+
+	return
+}
+
 func GetKafkaEnvData() (data KafkaEnvData, err error) {
 	brokerHostsStr := os.Getenv("KAFKA_BROKER_HOSTS")
 	data.InfoTopicName = os.Getenv("INFO_TOPIC_NAME")
