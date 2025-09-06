@@ -25,6 +25,7 @@ func main() {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
+
 	defer cancel()
 
 	logger := logger_lib.CreateLoggerAdapter(ctx, "main()")
