@@ -8,7 +8,7 @@ import (
 )
 
 type bodyWithId struct {
-	id uint `json:"id"`
+	Id uint `json:"id"`
 }
 
 func (h Handlers) DeleteAnnouncement(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +38,7 @@ func (h Handlers) DeleteAnnouncement(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	authorLogin, isAnnouncementFound, err := h.dao.GetAuthorLogin(body.id)
+	authorLogin, isAnnouncementFound, err := h.dao.GetAuthorLogin(body.Id)
 	if err != nil {
 		h.logger.WriteError("DeleteAnnouncement():" + err.Error())
 		http.Error(w, "server error", http.StatusInternalServerError)
@@ -55,7 +55,7 @@ func (h Handlers) DeleteAnnouncement(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err = h.dao.DeleteAnnouncement(body.id)
+	err = h.dao.DeleteAnnouncement(body.Id)
 	if err != nil {
 		http.Error(w, "server error", http.StatusInternalServerError)
 		return
