@@ -19,7 +19,7 @@
 
 ```
 git clone https://github.com/Vladimir220/marketplace.git
-cd markerplace
+cd marketplace
 docker-compose up -d
 ```
 
