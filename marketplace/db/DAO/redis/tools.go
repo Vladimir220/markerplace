@@ -31,7 +31,7 @@ func connect() (connection *redis.Client, ctx context.Context, err error) {
 
 	ctx = context.Background()
 
-	connection.FlushDB(ctx)
+	//connection.FlushDB(ctx)
 
 	return
 }

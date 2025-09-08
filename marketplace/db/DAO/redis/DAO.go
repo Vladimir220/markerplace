@@ -98,3 +98,7 @@ func (td *TokensDAO) SetUser(token string, user models.User) (err error) {
 
 	return
 }
+
+func (td *TokensDAO) Close() {
+	td.connection.Close()
+}

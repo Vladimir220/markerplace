@@ -6,9 +6,9 @@ import (
 	"writer_db_service/models"
 )
 
-func (md MarketplaceDAO) NewAnnouncement(announcement models.ExtendedAnnouncement) (err error) {
+func (md WriterMarketplaceDAO) NewAnnouncement(announcement models.ExtendedAnnouncement) (err error) {
 	if announcement.An.Title == "" || announcement.An.Body == "" || announcement.An.PicLink == "" || announcement.AuthorLogin == "" {
-		err = errors.New("MarketplaceDAO:NewAnnouncement: Title or Body or PicLink or AuthorLogin not specified")
+		err = errors.New("WriterMarketplaceDAO:NewAnnouncement: Title or Body or PicLink or AuthorLogin not specified")
 		return
 	}
 
@@ -17,7 +17,7 @@ func (md MarketplaceDAO) NewAnnouncement(announcement models.ExtendedAnnouncemen
 
 	_, err = md.connection.Exec(queryStr, announcement.An.Title, announcement.An.Body, announcement.An.PicLink, announcement.An.Price, announcement.Date, announcement.AuthorLogin)
 	if err != nil {
-		err = fmt.Errorf("MarketplaceDAO:NewAnnouncement(): %v", err)
+		err = fmt.Errorf("WriterMarketplaceDAO:NewAnnouncement(): %v", err)
 		return
 	}
 

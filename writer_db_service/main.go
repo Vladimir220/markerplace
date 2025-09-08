@@ -2,11 +2,12 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
+	"writer_db_service/db/DAO/postgres"
 	"writer_db_service/env"
+	"writer_db_service/log/proxies"
 
 	"github.com/joho/godotenv"
 )
@@ -25,7 +26,14 @@ func main() {
 		panic(err)
 	}
 
-	RunKafkaWorkers(ctx, WorkersConfig{
+	dao, err := postgres.CreateWriterMarketplaceDAO()
+	if err != nil {
+		panic(err)
+	}
+	daoWithLogs := proxies.CreateDAOWithLog(ctx, dao)
+	defer daoWithLogs.Close()
+
+	RunKafkaWorkers(ctx, daoWithLogs, WorkersConfig{
 		brokerHosts: kafkaKonfig.BrokerHosts,
 		topic:       kafkaKonfig.NewAnnouncementTopicName,
 		count:       kafkaKonfig.NumOfWorkers,
@@ -33,7 +41,22 @@ func main() {
 		groupId:     kafkaKonfig.GroupId,
 	})
 
-	fmt.Println("еее, здоровье!")
+	RunKafkaWorkers(ctx, daoWithLogs, WorkersConfig{
+		brokerHosts: kafkaKonfig.BrokerHosts,
+		topic:       kafkaKonfig.UpdateAnnouncementTopicName,
+		count:       kafkaKonfig.NumOfWorkers,
+		mod:         ModUpdateAnnouncement,
+		groupId:     kafkaKonfig.GroupId,
+	})
+
+	RunKafkaWorkers(ctx, daoWithLogs, WorkersConfig{
+		brokerHosts: kafkaKonfig.BrokerHosts,
+		topic:       kafkaKonfig.DeleteAnnouncementTopicName,
+		count:       kafkaKonfig.NumOfWorkers,
+		mod:         ModDeleteAnnouncement,
+		groupId:     kafkaKonfig.GroupId,
+	})
+
 	go HealthListener()
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT, syscall.SIGKILL)

@@ -35,7 +35,7 @@ type TokensDAO struct {
 }
 
 func (td *TokensDAO) GetUser(token string) (user models.User, exist bool, err error) {
-	logLabel := "GetUser():"
+	logLabel := "TokensDAO:GetUser():"
 	localTokenLable := fmt.Sprintf("%s%s", tokenLabel, token)
 
 	u, err := td.connection.HGetAll(td.ctx, localTokenLable).Result()
@@ -56,7 +56,7 @@ func (td *TokensDAO) GetUser(token string) (user models.User, exist bool, err er
 }
 
 func (td *TokensDAO) SetUser(token string, user models.User) (err error) {
-	logLabel := "SetUser():"
+	logLabel := "TokensDAO:SetUser():"
 	localUserLable := fmt.Sprintf("%s%s", userLabel, user.Login)
 	localTokenLable := fmt.Sprintf("%s%s", tokenLabel, token)
 
@@ -97,4 +97,8 @@ func (td *TokensDAO) SetUser(token string, user models.User) (err error) {
 	}
 
 	return
+}
+
+func (td *TokensDAO) Close() {
+	td.connection.Close()
 }

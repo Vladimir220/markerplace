@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 )
@@ -16,7 +15,7 @@ type ILogger interface {
 	WriteInfo(msg string)
 }
 
-func CreateLogger(parentName string) ILogger {
+func CreateLogger() ILogger {
 	errorLogFile, err := os.OpenFile(ErrorLogPath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		panic(err.Error())
@@ -31,9 +30,9 @@ func CreateLogger(parentName string) ILogger {
 	}
 
 	logger := &Logger{
-		warning: log.New(warningLogFile, fmt.Sprintf("WARNING:%s:", parentName), log.Ldate|log.Ltime|log.Lshortfile|log.Lmsgprefix),
-		err:     log.New(errorLogFile, fmt.Sprintf("ERROR:%s:", parentName), log.Ldate|log.Ltime|log.Lshortfile|log.Lmsgprefix),
-		info:    log.New(infoLogFile, fmt.Sprintf("INFO:%s:", parentName), log.Ldate|log.Ltime|log.Lshortfile|log.Lmsgprefix),
+		warning: log.New(warningLogFile, "WARNING:", log.Ldate|log.Ltime|log.Lshortfile|log.Lmsgprefix),
+		err:     log.New(errorLogFile, "ERROR:", log.Ldate|log.Ltime|log.Lshortfile|log.Lmsgprefix),
+		info:    log.New(infoLogFile, "INFO:", log.Ldate|log.Ltime|log.Lshortfile|log.Lmsgprefix),
 	}
 
 	return logger

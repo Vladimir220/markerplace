@@ -4,6 +4,7 @@ import (
 	"context"
 	"marketplace/crypto"
 	"marketplace/db/DAO/postgres"
+	"marketplace/env"
 
 	"github.com/Vladimir220/markerplace/logger_lib"
 )
@@ -16,12 +17,12 @@ type Handlers struct {
 	ctx          context.Context
 }
 
-func CreateHandlers(ctx context.Context, tokenManager crypto.ITokenManager, dao postgres.IMarketplaceDAO, infoLogs bool) Handlers {
+func CreateHandlers(ctx context.Context, tokenManager crypto.ITokenManager, dao postgres.IMarketplaceDAO) Handlers {
 	return Handlers{
-		logger:       logger_lib.CreateLoggerAdapter(ctx, "Handlers"),
+		logger:       logger_lib.CreateLoggerGateway(ctx, "Handlers"),
 		dao:          dao,
 		tokenManager: tokenManager,
-		infoLogs:     infoLogs,
+		infoLogs:     env.GetLogsConfig().PrintHandlersInfo,
 		ctx:          ctx,
 	}
 }

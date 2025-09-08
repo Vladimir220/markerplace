@@ -9,9 +9,9 @@ import (
 	"github.com/Vladimir220/markerplace/logger_lib"
 )
 
-func CreateDAOProxy(ctx context.Context) (dao IMarketplaceDAO, err error) {
-	logLabel := "CreateDAOProxy():"
-	logger := logger_lib.CreateLoggerAdapter(ctx, "DAOProxy")
+func CreateDAOGateway(ctx context.Context) (dao IMarketplaceDAO, err error) {
+	logLabel := "CreateDAOGateway():"
+	logger := logger_lib.CreateLoggerGateway(ctx, "DAOGateway")
 
 	grpcRemoteReader, err := remote.CreateGrpcReader(ctx)
 	var remoteReaderUnavailable bool
@@ -33,7 +33,7 @@ func CreateDAOProxy(ctx context.Context) (dao IMarketplaceDAO, err error) {
 		return
 	}
 
-	dao = &DAOProxy{
+	dao = &DAOGateway{
 		remoteReaderUnavailable: remoteReaderUnavailable,
 		remoteWriterUnavailable: remoteWriterUnavailable,
 		localDAO:                localDao,
@@ -46,7 +46,9 @@ func CreateDAOProxy(ctx context.Context) (dao IMarketplaceDAO, err error) {
 	return
 }
 
-type DAOProxy struct {
+// Proxy for IMarketplaceDAO
+// Adapter for IReader and IWriter
+type DAOGateway struct {
 	remoteReaderUnavailable bool
 	remoteWriterUnavailable bool
 	localDAO                IMarketplaceDAO
@@ -56,7 +58,7 @@ type DAOProxy struct {
 	logger                  logger_lib.ILogger
 }
 
-func (dao DAOProxy) GetAnnouncements(orderType *string, minPrice, maxPrice *uint, page uint) (announcement models.Announcements, err error) {
+func (dao DAOGateway) GetAnnouncements(orderType *string, minPrice, maxPrice *uint, page uint) (announcement models.Announcements, err error) {
 	if !dao.remoteReaderUnavailable {
 		announcement, err = dao.remoteReader.GetAnnouncements(orderType, minPrice, maxPrice, page)
 		if err == nil {
@@ -74,11 +76,10 @@ func (dao DAOProxy) GetAnnouncements(orderType *string, minPrice, maxPrice *uint
 	return
 }
 
-func (dao DAOProxy) NewAnnouncement(announcement models.ExtendedAnnouncement) (resAnnouncement models.ExtendedAnnouncement, err error) {
+func (dao DAOGateway) NewAnnouncement(announcement models.ExtendedAnnouncement) (resAnnouncement models.ExtendedAnnouncement, err error) {
 	if !dao.remoteWriterUnavailable {
 		err = dao.remoteWriter.NewAnnouncement(announcement)
 		if err == nil {
-			fmt.Println(resAnnouncement, err)
 			return
 		}
 	}
@@ -93,20 +94,66 @@ func (dao DAOProxy) NewAnnouncement(announcement models.ExtendedAnnouncement) (r
 	return
 }
 
-func (dao DAOProxy) Registr(login, password string) (user models.User, isAlreadyExist bool, err error) {
+func (dao DAOGateway) Registr(login, password string) (user models.User, isAlreadyExist bool, err error) {
 	user, isAlreadyExist, err = dao.localDAO.Registr(login, password)
 	if err != nil {
 		err = fmt.Errorf("%s:%v", "Registr():", err)
 	}
 	return
 }
-func (dao DAOProxy) Close() {
+
+func (dao DAOGateway) Close() {
 	dao.localDAO.Close()
 }
-func (dao DAOProxy) GetUser(login string) (user models.User, password string, isFound bool, err error) {
+
+func (dao DAOGateway) GetUser(login string) (user models.User, password string, isFound bool, err error) {
 	user, password, isFound, err = dao.localDAO.GetUser(login)
 	if err != nil {
 		err = fmt.Errorf("%s:%v", "GetUser():", err)
+	}
+	return
+}
+
+func (dao DAOGateway) UpdateAnnouncement(updatedAnnouncement models.ExtendedAnnouncement) (resAnnouncement models.ExtendedAnnouncement, err error) {
+	if !dao.remoteWriterUnavailable {
+		err = dao.remoteWriter.UpdateAnnouncement(updatedAnnouncement)
+		if err == nil {
+			return
+		}
+	}
+
+	dao.logger.WriteWarning(fmt.Sprintf("%s: %v", "UpdateAnnouncement(): remote remoteWriter unavailable", err))
+	resAnnouncement, err = dao.localDAO.UpdateAnnouncement(updatedAnnouncement)
+	if err != nil {
+		err = fmt.Errorf("%s: %v", "UpdateAnnouncement():", err)
+		return
+	}
+
+	return
+}
+
+func (dao DAOGateway) DeleteAnnouncement(announcementId uint) (err error) {
+	if !dao.remoteWriterUnavailable {
+		err = dao.remoteWriter.DeleteAnnouncement(announcementId)
+		if err == nil {
+			return
+		}
+	}
+
+	dao.logger.WriteWarning(fmt.Sprintf("%s: %v", "DeleteAnnouncement(): remote remoteWriter unavailable", err))
+	err = dao.localDAO.DeleteAnnouncement(announcementId)
+	if err != nil {
+		err = fmt.Errorf("%s: %v", "DeleteAnnouncement():", err)
+		return
+	}
+
+	return
+}
+
+func (dao DAOGateway) GetAuthorLogin(announcementId uint) (login string, isAnnouncementFound bool, err error) {
+	login, isAnnouncementFound, err = dao.localDAO.GetAuthorLogin(announcementId)
+	if err != nil {
+		err = fmt.Errorf("%s:%v", "GetAuthorLogin():", err)
 	}
 	return
 }

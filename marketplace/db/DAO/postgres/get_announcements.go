@@ -53,7 +53,7 @@ func (md MarketplaceDAO) GetAnnouncements(orderType *string, minPrice, maxPrice 
 
 	rows, err := md.connection.Query(queryStr)
 	if err != nil {
-		err = fmt.Errorf("MarketplaceDAO:GetUser: %v", err)
+		err = fmt.Errorf("MarketplaceDAO:GetAnnouncements: %v", err)
 		return
 	}
 	defer rows.Close()
@@ -62,7 +62,7 @@ func (md MarketplaceDAO) GetAnnouncements(orderType *string, minPrice, maxPrice 
 		announcement := models.ExtendedAnnouncement{}
 		err = rows.Scan(&announcement.An.Title, &announcement.An.Body, &announcement.An.PicLink, &announcement.An.Price, &announcement.Date, &announcement.AuthorLogin, &announcement.Id)
 		if err != nil {
-			err = fmt.Errorf("MarketplaceDAO:GetUser: %v", err)
+			err = fmt.Errorf("MarketplaceDAO:GetAnnouncements: %v", err)
 			return
 		}
 		announcements.Ans = append(announcements.Ans, announcement)

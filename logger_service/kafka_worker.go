@@ -35,7 +35,7 @@ func RunKafkaWorkers(ctx context.Context, config WorkersConfig) {
 }
 
 func KafkaWorker(ctx context.Context, reader *kafka.Reader, mod int) {
-	logger := CreateLogger("KafkaWorker()")
+	logger := CreateLogger()
 	defer reader.Close()
 
 	for {

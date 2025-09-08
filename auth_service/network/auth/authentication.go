@@ -3,7 +3,7 @@ package auth
 import (
 	"auth_service/crypto"
 	"auth_service/db/DAO/postgres"
-	"auth_service/models"
+	"auth_service/env"
 	"context"
 	"errors"
 	"fmt"
@@ -11,32 +11,24 @@ import (
 	"github.com/Vladimir220/markerplace/logger_lib"
 )
 
-var ErrLogin = errors.New("Incorrect password or login")
-var ErrLoginFormat = errors.New("Incorrect login format")
-var ErrPasswordFormat = errors.New("Incorrect password format")
-var ErrLoginIsTaken = errors.New("Login is taken")
-var ErrServer = errors.New("Server error")
+var ErrLogin = errors.New("incorrect password or login")
+var ErrLoginFormat = errors.New("incorrect login format")
+var ErrPasswordFormat = errors.New("incorrect password format")
+var ErrLoginIsTaken = errors.New("login is taken")
+var ErrServer = errors.New("server error")
 
 type IAuthentication interface {
 	Register(login, password string) (token string, err error)
 	Login(login, password string) (token string, err error)
 }
 
-func CreateAuthentication(ctx context.Context, tokenManager crypto.ITokenManager, logsConfig models.LogsConfig) (IAuthentication, error) {
-	dao, err := postgres.CreateMarketplaceDAO()
-	if err != nil {
-		return nil, fmt.Errorf("CreateAuthentication():%v", err)
-	}
+func CreateAuthentication(ctx context.Context, tokenManager crypto.ITokenManager, dao postgres.IMarketplaceDAO) IAuthentication {
 	return &Authentication{
 		tokenManager: tokenManager,
 		dao:          dao,
-		logger: logger_lib.CreateLoggerGateway(ctx, "Authentication", logger_lib.LoggerGatewayConfig{
-			PrintErrorsToStdOut:   logsConfig.PrintErrorsToStdOut,
-			PrintWarningsToStdOut: logsConfig.PrintWarningsToStdOut,
-			PrintInfoToStdOut:     logsConfig.PrintInfoToStdOut,
-		}),
-		infoLogs: logsConfig.InfoLogs,
-	}, nil
+		logger:       logger_lib.CreateLoggerGateway(ctx, "Authentication"),
+		infoLogs:     env.GetLogsConfig().PrintAuthenticationInfo,
+	}
 }
 
 type Authentication struct {

@@ -8,6 +8,7 @@ import (
 type ITokensDAO interface {
 	GetUser(token string) (user models.User, exist bool, err error)
 	SetUser(token string, user models.User) (err error)
+	Close()
 }
 
 func CreateReserveTokensDAO() ITokensDAO {
@@ -42,3 +43,5 @@ func (td *ReserveTokensDAO) SetUser(token string, user models.User) (err error) 
 	td.t[token] = user
 	return
 }
+
+func (td *ReserveTokensDAO) Close() {}

@@ -3,7 +3,7 @@ module auth_service
 go 1.24.0
 
 require (
-	github.com/Vladimir220/markerplace/logger_lib v0.0.0-20250906162149-4203539f4fd3
+	github.com/Vladimir220/markerplace/logger_lib v0.0.0-20250906173106-bedb3bcc8f24
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/uuid v1.6.0
 	github.com/lib/pq v1.10.9

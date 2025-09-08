@@ -34,25 +34,29 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	tokensDAO := proxies.CreateTokensDAOWithLog(ctx, td, true)
-	tm := crypto.CreateTokenManagerProxy(ctx, tokensDAO, true)
+	tokensDAO := proxies.CreateTokensDAOWithLog(ctx, td)
+	defer tokensDAO.Close()
 
-	dao, err := postgres.CreateDAOProxy(ctx)
+	tm := crypto.CreateTokenManagerGateway(ctx, tokensDAO)
+
+	dao, err := postgres.CreateDAOGateway(ctx)
 	if err != nil {
 		panic(err)
 	}
-	daoWithLog := proxies.CreateDAOWithLog(ctx, dao, true)
-	defer daoWithLog.Close()
+	daoWithLogs := proxies.CreateDAOWithLog(ctx, dao)
+	defer daoWithLogs.Close()
 
-	h := handlers.CreateHandlers(ctx, tm, daoWithLog, true)
+	h := handlers.CreateHandlers(ctx, tm, daoWithLogs)
 
 	routerPaths := mux.NewRouter()
 	routerPaths.HandleFunc("/login", h.Login)
 	routerPaths.HandleFunc("/register", h.Register)
 	routerPaths.HandleFunc("/new_announcement", h.NewAnnouncement)
 	routerPaths.HandleFunc("/announcements", h.Announcements)
+	routerPaths.HandleFunc("/update_announcement", h.UpdateAnnouncement)
+	routerPaths.HandleFunc("/delete_announcement", h.DeleteAnnouncement)
 
-	authMiddleware := middleware.CreateAuthorizationMiddleware(ctx, tm, true)
+	authMiddleware := middleware.CreateAuthorizationMiddleware(ctx, tm)
 	authMiddleware.SetNext(routerPaths)
 
 	go handlers.HealthListener()

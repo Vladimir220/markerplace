@@ -18,7 +18,7 @@ type KafkaEnvData struct {
 }
 
 func GetKafkaEnvData() (data KafkaEnvData, err error) {
-	logLabel := "getKafkaEnvData()"
+	logLabel := "GetKafkaEnvData():"
 
 	brokerHostsStr := os.Getenv("KAFKA_BROKER_HOSTS")
 	countStr := os.Getenv("NUM_OF_WORKERS_FOR_EACH_TOPIC")

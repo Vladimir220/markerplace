@@ -11,10 +11,12 @@ import (
 
 type IWriterMarketplaceDAO interface {
 	NewAnnouncement(announcement models.ExtendedAnnouncement) (err error)
+	UpdateAnnouncement(updatedAnnouncement models.ExtendedAnnouncement) (err error)
+	DeleteAnnouncement(announcementId uint) (err error)
 	Close()
 }
 
-func CreateMarketplaceDAO() (dao IWriterMarketplaceDAO, err error) {
+func CreateWriterMarketplaceDAO() (dao IWriterMarketplaceDAO, err error) {
 	logLabel := "CreateMarketplaceDAO():"
 
 	err = checkDbExistence(5, time.Second)
@@ -29,17 +31,17 @@ func CreateMarketplaceDAO() (dao IWriterMarketplaceDAO, err error) {
 		return
 	}
 
-	mpDao := &MarketplaceDAO{
+	mpDao := &WriterMarketplaceDAO{
 		connection: connection,
 	}
 
 	return mpDao, nil
 }
 
-type MarketplaceDAO struct {
+type WriterMarketplaceDAO struct {
 	connection *sql.DB
 }
 
-func (md MarketplaceDAO) Close() {
+func (md WriterMarketplaceDAO) Close() {
 	md.connection.Close()
 }

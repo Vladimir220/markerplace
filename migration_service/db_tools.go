@@ -30,7 +30,7 @@ func Connect() (db *sql.DB, err error) {
 }
 
 func CheckMigrations(connection *sql.DB) error {
-	logLabel := "checkMigrations():"
+	logLabel := "CheckMigrations():"
 
 	if connection == nil {
 		return fmt.Errorf("%s no connection", logLabel)
@@ -62,7 +62,7 @@ func CheckMigrations(connection *sql.DB) error {
 }
 
 func CheckDbExistence() (err error) {
-	logLabel := "checkDbExistence():"
+	logLabel := "CheckDbExistence():"
 
 	data, err := env.GetPostgresEnvData()
 	if err != nil {
@@ -86,7 +86,6 @@ func CheckDbExistence() (err error) {
 		err = fmt.Errorf("%s %v", logLabel, err)
 		return
 	}
-	fmt.Println()
 
 	if !isDbExist {
 		_, err = tempConn.Exec(fmt.Sprintf("CREATE DATABASE %s;", data.DbName))

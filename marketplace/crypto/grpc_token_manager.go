@@ -28,7 +28,7 @@ func CreateGrpcTokenManager(ctx context.Context) (tokenManager ITokenManager, er
 
 	tokenManager = &GrpcTokenManager{
 		host:   data.AuthGRPCHost,
-		logger: logger_lib.CreateLoggerAdapter(ctx, "GrpcTokenManager"),
+		logger: logger_lib.CreateLoggerGateway(ctx, "GrpcTokenManager"),
 		ctx:    ctx,
 	}
 
@@ -42,7 +42,7 @@ type GrpcTokenManager struct {
 }
 
 func (tm GrpcTokenManager) ValidateToken(token string) (user models.User, isValid, isErr bool) {
-	logLabel := "GrpcTokenManager:ValidateToken():"
+	logLabel := "ValidateToken():"
 
 	conn, err := grpc.NewClient(tm.host, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -72,7 +72,7 @@ func (tm GrpcTokenManager) ValidateToken(token string) (user models.User, isVali
 }
 
 func (tm GrpcTokenManager) GenerateToken(user models.User) (token string, isErr bool) {
-	logLabel := "GrpcTokenManager:GenerateToken():"
+	logLabel := "GenerateToken():"
 
 	conn, err := grpc.NewClient(tm.host, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {

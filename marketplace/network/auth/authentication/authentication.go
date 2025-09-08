@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"marketplace/crypto"
 	"marketplace/db/DAO/postgres"
+	"marketplace/env"
 	"marketplace/network/auth/tools"
 
 	"github.com/Vladimir220/markerplace/logger_lib"
@@ -15,17 +16,13 @@ type IAuthentication interface {
 	Login(login, password string) (token string, err error)
 }
 
-func CreateAuthentication(ctx context.Context, tokenManager crypto.ITokenManager, infoLogs bool) (IAuthentication, error) {
-	dao, err := postgres.CreateMarketplaceDAO()
-	if err != nil {
-		return nil, fmt.Errorf("CreateAuthentication():%v", err)
-	}
+func CreateAuthentication(ctx context.Context, tokenManager crypto.ITokenManager, dao postgres.IMarketplaceDAO) IAuthentication {
 	return &Authentication{
 		tokenManager: tokenManager,
 		dao:          dao,
-		logger:       logger_lib.CreateLoggerAdapter(ctx, "Authentication"),
-		infoLogs:     infoLogs,
-	}, nil
+		logger:       logger_lib.CreateLoggerGateway(ctx, "Authentication"),
+		infoLogs:     env.GetLogsConfig().PrintAuthenticationInfo,
+	}
 }
 
 type Authentication struct {

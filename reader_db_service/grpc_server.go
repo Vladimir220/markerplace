@@ -2,31 +2,34 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"reader_db_service/DAO/postgres"
+	"reader_db_service/db/DAO/postgres"
 	"reader_db_service/gen"
+
+	"github.com/Vladimir220/markerplace/logger_lib"
 )
 
-func CreateServer(dao postgres.IMarketplaceDAO) gen.ReaderServer {
+func CreateServer(ctx context.Context, dao postgres.IMarketplaceDAO) gen.ReaderServer {
 	return &Server{
-		dao: dao,
+		dao:    dao,
+		logger: logger_lib.CreateLoggerGateway(ctx, "Server"),
 	}
 }
 
 type Server struct {
 	gen.UnimplementedReaderServer
-	dao postgres.IMarketplaceDAO
+	dao    postgres.IMarketplaceDAO
+	logger logger_lib.ILogger
 }
 
 func (s Server) GetAnnouncements(ctx context.Context, req *gen.AnnouncementsRequest) (resp *gen.AnnouncementsResponse, err error) {
-	fmt.Println("я отработал1")
+	logLabel := fmt.Sprintf("%s:%s:", serviceName, "GetAnnouncements()")
+
 	if req == nil {
-		err = errors.New("AnnouncementsRequest is nil")
+		err = fmt.Errorf("%s %s", logLabel, "AnnouncementsRequest is nil")
+		s.logger.WriteError(err.Error())
 		return
 	}
-
-	fmt.Println("я отработал")
 
 	var minPrice, maxPrice *uint
 	if req.MinPrice != nil {

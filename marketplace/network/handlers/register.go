@@ -36,14 +36,9 @@ func (h Handlers) Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "expected fields login and password", http.StatusBadRequest)
 	}
 
-	a, err := authentication.CreateAuthenticationProxy(h.ctx, h.tokenManager, h.infoLogs)
-	if err != nil {
-		h.logger.WriteError(fmt.Sprintf("%s %v", logLabel, err))
-		http.Error(w, "server error", http.StatusInternalServerError)
-		return
-	}
+	auth := authentication.CreateAuthenticationGateway(h.ctx, h.tokenManager, h.dao)
 
-	token, err := a.Register(user.Login, user.Password)
+	token, err := auth.Register(user.Login, user.Password)
 	switch err {
 	case tools.ErrLoginIsTaken, tools.ErrLoginFormat, tools.ErrPasswordFormat:
 		http.Error(w, err.Error(), http.StatusUnauthorized)

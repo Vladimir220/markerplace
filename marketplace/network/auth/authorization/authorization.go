@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"marketplace/crypto"
+	"marketplace/env"
 
 	"github.com/Vladimir220/markerplace/logger_lib"
 )
@@ -12,11 +13,11 @@ type IAuthorization interface {
 	Authorize(ctx context.Context, token string) (updatedCtx context.Context, success bool)
 }
 
-func CreateAuthorization(ctx context.Context, tokenManager crypto.ITokenManager, infoLogs bool) IAuthorization {
+func CreateAuthorization(ctx context.Context, tokenManager crypto.ITokenManager) IAuthorization {
 	return &Authorization{
 		tokenManager: tokenManager,
-		logger:       logger_lib.CreateLoggerAdapter(ctx, "Authorization"),
-		infoLogs:     infoLogs,
+		logger:       logger_lib.CreateLoggerGateway(ctx, "Authorization"),
+		infoLogs:     env.GetLogsConfig().PrintAuthorizationInfo,
 	}
 }
 

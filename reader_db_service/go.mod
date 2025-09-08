@@ -3,7 +3,7 @@ module reader_db_service
 go 1.24.0
 
 require (
-	github.com/Vladimir220/markerplace/logger_lib v0.0.0-20250906152542-4b71d3d75230
+	github.com/Vladimir220/markerplace/logger_lib v0.0.0-20250906173106-bedb3bcc8f24
 	github.com/lib/pq v1.10.9
 	google.golang.org/grpc v1.75.0
 	google.golang.org/protobuf v1.36.8

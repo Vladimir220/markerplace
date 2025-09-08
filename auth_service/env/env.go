@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
 
 type PostgresEnvData struct {
@@ -16,13 +17,44 @@ type RedisEnvData struct {
 	DbNum          int
 }
 
+type LogsConfig struct {
+	PrintTokenDAOInfo       bool
+	PrintMarketplaceDAOInfo bool
+	PrintAuthenticationInfo bool
+	PrintHandlersInfo       bool
+}
+
+func GetLogsConfig() (data LogsConfig) {
+	printTokenDAOInfoStr := os.Getenv("PRINT_TOKEN_DAO_INFO")
+	if strings.ToUpper(printTokenDAOInfoStr) == "TRUE" {
+		data.PrintTokenDAOInfo = true
+	}
+
+	printMarketplaceDAOInfoStr := os.Getenv("PRINT_MARKETPLACE_DAO_INFO")
+	if strings.ToUpper(printMarketplaceDAOInfoStr) == "TRUE" {
+		data.PrintMarketplaceDAOInfo = true
+	}
+
+	printAuthenticationInfoStr := os.Getenv("PRINT_AUTHENTICATION_INFO")
+	if strings.ToUpper(printAuthenticationInfoStr) == "TRUE" {
+		data.PrintAuthenticationInfo = true
+	}
+
+	printHandlersInfoStr := os.Getenv("PRINT_HANDLERS_INFO")
+	if strings.ToUpper(printHandlersInfoStr) == "TRUE" {
+		data.PrintHandlersInfo = true
+	}
+
+	return
+}
+
 func GetPostgresEnvData() (data PostgresEnvData, err error) {
 	data.User = os.Getenv("DB_USER")
-	data.Password = os.Getenv("DB_PASSWORD")
 	data.DbName = os.Getenv("DB_NAME")
+	data.Password = os.Getenv("DB_PASSWORD")
 	data.Host = os.Getenv("DB_HOST")
-	if data.User == "" || data.Password == "" || data.DbName == "" || data.Host == "" {
-		err = errors.New("GetEnvLoginData(): one of the following variables is not specified in .env: DB_USER, DB_PASSWORD, DB_NAME, DB_HOST")
+	if data.User == "" || data.DbName == "" || data.Host == "" {
+		err = errors.New("GetEnvLoginData(): one of the following variables is not specified in .env: DB_USER, DB_NAME, DB_HOST")
 		return
 	}
 	return

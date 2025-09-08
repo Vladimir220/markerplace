@@ -11,13 +11,9 @@ import (
 	"github.com/Vladimir220/markerplace/logger_lib"
 )
 
-func CreateServer(ctx context.Context, auth auth.IAuthentication, tokenManager crypto.ITokenManager, logsConfig models.LogsConfig) (server gen.AuthServer) {
+func CreateServer(ctx context.Context, auth auth.IAuthentication, tokenManager crypto.ITokenManager) (server gen.AuthServer) {
 	server = Server{
-		logger: logger_lib.CreateLoggerGateway(ctx, "Server", logger_lib.LoggerGatewayConfig{
-			PrintErrorsToStdOut:   logsConfig.PrintErrorsToStdOut,
-			PrintWarningsToStdOut: logsConfig.PrintWarningsToStdOut,
-			PrintInfoToStdOut:     logsConfig.PrintInfoToStdOut,
-		}),
+		logger:       logger_lib.CreateLoggerGateway(ctx, "Server"),
 		auth:         auth,
 		tokenManager: tokenManager,
 	}
@@ -32,8 +28,7 @@ type Server struct {
 }
 
 func (s Server) ValidateToken(ctx context.Context, req *gen.ValidateTokenRequest) (resp *gen.ValidateTokenResponse, err error) {
-	logLabel := "ValidateToken():"
-	fmt.Println("я отработал")
+	logLabel := fmt.Sprintf("%s:%s:", serviceName, "ValidateToken()")
 
 	if req == nil {
 		err = fmt.Errorf("%s %s", logLabel, "ValidateTokenRequest is nil")
@@ -57,7 +52,7 @@ func (s Server) ValidateToken(ctx context.Context, req *gen.ValidateTokenRequest
 }
 
 func (s Server) Register(ctx context.Context, req *gen.RegisterRequest) (resp *gen.RegisterResponse, err error) {
-	logLabel := "Register():"
+	logLabel := fmt.Sprintf("%s:%s:", serviceName, "Register()")
 
 	if req == nil {
 		err = fmt.Errorf("%s %s", logLabel, "RegisterRequest is nil")
@@ -67,6 +62,7 @@ func (s Server) Register(ctx context.Context, req *gen.RegisterRequest) (resp *g
 
 	token, err := s.auth.Register(req.Login, req.Password)
 	if err != nil {
+		err = fmt.Errorf("%s %v", logLabel, err)
 		return
 	}
 
@@ -78,7 +74,7 @@ func (s Server) Register(ctx context.Context, req *gen.RegisterRequest) (resp *g
 }
 
 func (s Server) Login(ctx context.Context, req *gen.LoginRequest) (resp *gen.LoginResponse, err error) {
-	logLabel := "Login():"
+	logLabel := fmt.Sprintf("%s:%s:", serviceName, "Login()")
 
 	if req == nil {
 		err = fmt.Errorf("%s %s", logLabel, "LoginRequest is nil")
@@ -88,6 +84,7 @@ func (s Server) Login(ctx context.Context, req *gen.LoginRequest) (resp *gen.Log
 
 	token, err := s.auth.Login(req.Login, req.Password)
 	if err != nil {
+		err = fmt.Errorf("%s %s", logLabel, err)
 		return
 	}
 
@@ -100,7 +97,7 @@ func (s Server) Login(ctx context.Context, req *gen.LoginRequest) (resp *gen.Log
 }
 
 func (s Server) GenerateToken(ctx context.Context, req *gen.GenerateTokenRequest) (resp *gen.GenerateTokenResponse, err error) {
-	logLabel := "GenerateToken():"
+	logLabel := fmt.Sprintf("%s:%s:", serviceName, "GenerateToken()")
 
 	if req == nil {
 		err = fmt.Errorf("%s %s", logLabel, "GenerateTokenRequest is nil")

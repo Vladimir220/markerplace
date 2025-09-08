@@ -10,9 +10,9 @@ import (
 
 const cookieFieldName = "auth-cookie"
 
-func CreateAuthorizationMiddleware(ctx context.Context, tokenManager crypto.ITokenManager, infoLogs bool) IMiddleware {
+func CreateAuthorizationMiddleware(ctx context.Context, tokenManager crypto.ITokenManager) IMiddleware {
 	return &AuthorizationMiddleware{
-		authorization: authorization.CreateAuthorization(ctx, tokenManager, infoLogs),
+		authorization: authorization.CreateAuthorization(ctx, tokenManager),
 	}
 }
 

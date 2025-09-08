@@ -14,6 +14,9 @@ type IMarketplaceDAO interface {
 	GetUser(login string) (user models.User, password string, isFound bool, err error)
 	NewAnnouncement(announcement models.ExtendedAnnouncement) (resAnnouncement models.ExtendedAnnouncement, err error)
 	Registr(login, password string) (user models.User, isAlreadyExist bool, err error)
+	UpdateAnnouncement(updatedAnnouncement models.ExtendedAnnouncement) (resAnnouncement models.ExtendedAnnouncement, err error)
+	DeleteAnnouncement(announcementId uint) (err error)
+	GetAuthorLogin(announcementId uint) (login string, isAnnouncementFound bool, err error)
 	Close()
 }
 

@@ -20,29 +20,20 @@ type ITokenManager interface {
 	ValidateToken(token string) (user models.User, isValid, isErr bool)
 }
 
-func CreateTokenManager(ctx context.Context, tokensDAO DAO.ITokensDAO, logsConfig models.LogsConfig) ITokenManager {
+func CreateTokenManager(ctx context.Context, tokensDAO DAO.ITokensDAO) ITokenManager {
 	return &TokenManager{
 		tokensDAO: tokensDAO,
-		logger: logger_lib.CreateLoggerGateway(ctx, "TokenManager", logger_lib.LoggerGatewayConfig{
-			PrintErrorsToStdOut:   logsConfig.PrintErrorsToStdOut,
-			PrintWarningsToStdOut: logsConfig.PrintWarningsToStdOut,
-			PrintInfoToStdOut:     logsConfig.PrintInfoToStdOut,
-		}),
-		infoLogs: logsConfig.InfoLogs,
+		logger:    logger_lib.CreateLoggerGateway(ctx, "TokenManager"),
 	}
 }
 
 type TokenManager struct {
 	tokensDAO DAO.ITokensDAO
 	logger    logger_lib.ILogger
-	infoLogs  bool
 }
 
 func (tm *TokenManager) GenerateToken(user models.User) (token string, isErr bool) {
 	logLabel := fmt.Sprintf("GenerateToken():[params:%v]:", user)
-	if tm.infoLogs {
-		tm.logger.WriteInfo(fmt.Sprintf("%s %s", logLabel, "get"))
-	}
 
 	id, err := uuid.NewRandom()
 	if err != nil {
@@ -79,9 +70,6 @@ func (tm *TokenManager) GenerateToken(user models.User) (token string, isErr boo
 
 func (tm *TokenManager) ValidateToken(token string) (user models.User, isValid, isErr bool) {
 	logLabel := fmt.Sprintf("ValidateToken():[params:%s]:", token)
-	if tm.infoLogs {
-		tm.logger.WriteInfo(fmt.Sprintf("%s %s", logLabel, "get"))
-	}
 
 	claims := &jwt.RegisteredClaims{}
 	tokenJWT, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (any, error) {

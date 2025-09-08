@@ -34,11 +34,11 @@ func GetKafkaEnvData() (data KafkaEnvData, err error) {
 
 func GetPostgresEnvData() (data PostgresEnvData, err error) {
 	data.User = os.Getenv("DB_USER")
-	data.Password = os.Getenv("DB_PASSWORD")
 	data.DbName = os.Getenv("DB_NAME")
+	data.Password = os.Getenv("DB_PASSWORD")
 	data.Host = os.Getenv("DB_HOST")
-	if data.User == "" || data.Password == "" || data.DbName == "" || data.Host == "" {
-		err = errors.New("getEnvLoginData(): one of the following variables is not specified in .env: DB_USER, DB_PASSWORD, DB_NAME, DB_HOST")
+	if data.User == "" || data.DbName == "" || data.Host == "" {
+		err = errors.New("getEnvLoginData(): one of the following variables is not specified in .env: DB_USER, DB_NAME, DB_HOST")
 		return
 	}
 	return

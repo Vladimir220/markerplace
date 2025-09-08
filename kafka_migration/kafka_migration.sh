@@ -29,6 +29,8 @@ $KAFKA_TOPICS --create --if-not-exists --bootstrap-server :9092 --topic new-anno
 $KAFKA_TOPICS --create --if-not-exists --bootstrap-server :9092 --topic warning-logs --partitions 5
 $KAFKA_TOPICS --create --if-not-exists --bootstrap-server :9092 --topic info-logs --partitions 5
 $KAFKA_TOPICS --create --if-not-exists --bootstrap-server :9092 --topic error-logs --partitions 5
+$KAFKA_TOPICS --create --if-not-exists --bootstrap-server :9092 --topic update-announcement --partitions 5
+$KAFKA_TOPICS --create --if-not-exists --bootstrap-server :9092 --topic delete-announcement --partitions 5
 
 echo "All topics created successfully!"
 

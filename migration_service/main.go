@@ -17,7 +17,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	logger := logger_lib.CreateLoggerAdapter(ctx, "main()")
+	logger := logger_lib.CreateLoggerGateway(ctx, "main()")
 
 	connection, err := Connect()
 	if err != nil {

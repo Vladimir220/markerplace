@@ -18,7 +18,7 @@ func GetHashedPassword(password string) (hashedPassword string, err error) {
 }
 
 func ComparePassword(password, hashedPassword string) (equal bool, err error) {
-	logLabel := fmt.Sprintf("ComparePassword():[params:%s,%s]:", password, hashedPassword)
+	logLabel := fmt.Sprintf("ComparePassword():[params:%s,%s]:", "***", "***")
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	if err == bcrypt.ErrMismatchedHashAndPassword {
 		return
