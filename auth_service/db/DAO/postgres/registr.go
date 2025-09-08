@@ -7,9 +7,9 @@ import (
 	"fmt"
 )
 
-func (md MarketplaceDAO) Registr(login, password string) (user models.User, isAlreadyExist bool, err error) {
+func (md AuthMarketplaceDAO) Registr(login, password string) (user models.User, isAlreadyExist bool, err error) {
 	if login == "" || password == "" {
-		err = errors.New("MarketplaceDAO:Registr: login or password not specified")
+		err = errors.New("AuthMarketplaceDAO:Registr: login or password not specified")
 		return
 	}
 
@@ -23,7 +23,7 @@ func (md MarketplaceDAO) Registr(login, password string) (user models.User, isAl
 		isAlreadyExist = true
 		err = nil
 	} else if err != nil {
-		err = fmt.Errorf("MarketplaceDAO:Registr: %v", err)
+		err = fmt.Errorf("AuthMarketplaceDAO:Registr: %v", err)
 		return
 	}
 

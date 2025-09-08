@@ -7,7 +7,7 @@ func (md WriterMarketplaceDAO) DeleteAnnouncement(announcementId uint) (err erro
 
 	_, err = md.connection.Exec(queryStr, announcementId)
 	if err != nil {
-		err = fmt.Errorf("MarketplaceDAO:DeleteAnnouncement: %v", err)
+		err = fmt.Errorf("WriterMarketplaceDAO:DeleteAnnouncement: %v", err)
 		return
 	}
 

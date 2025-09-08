@@ -7,7 +7,7 @@ import (
 
 const pageSize = 10
 
-func (md MarketplaceDAO) GetAnnouncements(orderType *string, minPrice, maxPrice *uint, page uint) (announcements models.Announcements, err error) {
+func (md ReaderMarketplaceDAO) GetAnnouncements(orderType *string, minPrice, maxPrice *uint, page uint) (announcements models.Announcements, err error) {
 	announcements.Ans = make([]models.ExtendedAnnouncement, 0, pageSize)
 	announcements.PriceFilter = true
 	var filter string
@@ -53,7 +53,7 @@ func (md MarketplaceDAO) GetAnnouncements(orderType *string, minPrice, maxPrice 
 
 	rows, err := md.connection.Query(queryStr)
 	if err != nil {
-		err = fmt.Errorf("MarketplaceDAO:GetUser: %v", err)
+		err = fmt.Errorf("ReaderMarketplaceDAO:GetUser: %v", err)
 		return
 	}
 	defer rows.Close()
@@ -62,7 +62,7 @@ func (md MarketplaceDAO) GetAnnouncements(orderType *string, minPrice, maxPrice 
 		announcement := models.ExtendedAnnouncement{}
 		err = rows.Scan(&announcement.An.Title, &announcement.An.Body, &announcement.An.PicLink, &announcement.An.Price, &announcement.Date, &announcement.AuthorLogin, &announcement.Id)
 		if err != nil {
-			err = fmt.Errorf("MarketplaceDAO:GetUser: %v", err)
+			err = fmt.Errorf("ReaderMarketplaceDAO:GetUser: %v", err)
 			return
 		}
 		announcements.Ans = append(announcements.Ans, announcement)

@@ -9,14 +9,14 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type IMarketplaceDAO interface {
+type IAuthMarketplaceDAO interface {
 	GetUser(login string) (user models.User, password string, isFound bool, err error)
 	Registr(login, password string) (user models.User, isAlreadyExist bool, err error)
 	Close()
 }
 
-func CreateMarketplaceDAO() (dao IMarketplaceDAO, err error) {
-	logLabel := "CreateMarketplaceDAO():"
+func CreateAuthMarketplaceDAO() (dao IAuthMarketplaceDAO, err error) {
+	logLabel := "CreateAuthMarketplaceDAO():"
 
 	err = checkDbExistence(5, time.Second)
 	if err != nil {
@@ -30,17 +30,17 @@ func CreateMarketplaceDAO() (dao IMarketplaceDAO, err error) {
 		return
 	}
 
-	mpDao := &MarketplaceDAO{
+	mpDao := &AuthMarketplaceDAO{
 		connection: connection,
 	}
 
 	return mpDao, nil
 }
 
-type MarketplaceDAO struct {
+type AuthMarketplaceDAO struct {
 	connection *sql.DB
 }
 
-func (md MarketplaceDAO) Close() {
+func (md AuthMarketplaceDAO) Close() {
 	md.connection.Close()
 }

@@ -7,9 +7,9 @@ import (
 	"fmt"
 )
 
-func (md MarketplaceDAO) GetUser(login string) (user models.User, password string, isFound bool, err error) {
+func (md AuthMarketplaceDAO) GetUser(login string) (user models.User, password string, isFound bool, err error) {
 	if login == "" {
-		err = errors.New("MarketplaceDAO:GetUser: login not specified")
+		err = errors.New("AuthMarketplaceDAO:GetUser: login not specified")
 		return
 	}
 
@@ -20,7 +20,7 @@ func (md MarketplaceDAO) GetUser(login string) (user models.User, password strin
 		err = nil
 		return
 	} else if err != nil {
-		err = fmt.Errorf("MarketplaceDAO:GetUser: %v", err)
+		err = fmt.Errorf("AuthMarketplaceDAO:GetUser: %v", err)
 		return
 	} else {
 		isFound = true

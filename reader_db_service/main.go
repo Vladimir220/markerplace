@@ -36,7 +36,7 @@ func main() {
 
 	go HealthListener()
 
-	dao, err := postgres.CreateMarketplaceDAO()
+	dao, err := postgres.CreateReaderMarketplaceDAO()
 	if err != nil {
 		logger.WriteError(err.Error())
 		panic(err)

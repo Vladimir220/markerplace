@@ -10,16 +10,16 @@ import (
 	"github.com/Vladimir220/markerplace/logger_lib"
 )
 
-func CreateDAOWithLog(ctx context.Context, dao postgres.IMarketplaceDAO) postgres.IMarketplaceDAO {
+func CreateDAOWithLog(ctx context.Context, dao postgres.IAuthMarketplaceDAO) postgres.IAuthMarketplaceDAO {
 	return &DAOWithLog{
 		original: dao,
-		logger:   logger_lib.CreateLoggerGateway(ctx, "IMarketplaceDAO"),
+		logger:   logger_lib.CreateLoggerGateway(ctx, "IAuthMarketplaceDAO"),
 		infoLogs: env.GetLogsConfig().PrintMarketplaceDAOInfo,
 	}
 }
 
 type DAOWithLog struct {
-	original postgres.IMarketplaceDAO
+	original postgres.IAuthMarketplaceDAO
 	logger   logger_lib.ILogger
 	infoLogs bool
 }

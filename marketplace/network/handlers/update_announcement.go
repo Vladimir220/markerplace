@@ -10,8 +10,8 @@ import (
 
 func (h Handlers) UpdateAnnouncement(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	if r.Method != http.MethodPost {
-		http.Error(w, "expected POST", http.StatusMethodNotAllowed)
+	if r.Method != http.MethodPut {
+		http.Error(w, "expected PUT", http.StatusMethodNotAllowed)
 		return
 	}
 

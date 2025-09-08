@@ -9,7 +9,7 @@ import (
 	"github.com/Vladimir220/markerplace/logger_lib"
 )
 
-func CreateServer(ctx context.Context, dao postgres.IMarketplaceDAO) gen.ReaderServer {
+func CreateServer(ctx context.Context, dao postgres.IReaderMarketplaceDAO) gen.ReaderServer {
 	return &Server{
 		dao:    dao,
 		logger: logger_lib.CreateLoggerGateway(ctx, "Server"),
@@ -18,7 +18,7 @@ func CreateServer(ctx context.Context, dao postgres.IMarketplaceDAO) gen.ReaderS
 
 type Server struct {
 	gen.UnimplementedReaderServer
-	dao    postgres.IMarketplaceDAO
+	dao    postgres.IReaderMarketplaceDAO
 	logger logger_lib.ILogger
 }
 

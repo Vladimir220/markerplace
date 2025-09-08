@@ -1,2 +1,3 @@
 */logs/*.log
 */go.sum
+*.spl7

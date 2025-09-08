@@ -9,13 +9,13 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type IMarketplaceDAO interface {
+type IReaderMarketplaceDAO interface {
 	GetAnnouncements(orderType *string, minPrice, maxPrice *uint, page uint) (announcement models.Announcements, err error)
 	Close()
 }
 
-func CreateMarketplaceDAO() (dao IMarketplaceDAO, err error) {
-	logLabel := "CreateMarketplaceDAO():"
+func CreateReaderMarketplaceDAO() (dao IReaderMarketplaceDAO, err error) {
+	logLabel := "CreateReaderMarketplaceDAO():"
 
 	err = checkDbExistence(5, time.Second)
 	if err != nil {
@@ -29,17 +29,17 @@ func CreateMarketplaceDAO() (dao IMarketplaceDAO, err error) {
 		return
 	}
 
-	mpDao := &MarketplaceDAO{
+	mpDao := &ReaderMarketplaceDAO{
 		connection: connection,
 	}
 
 	return mpDao, nil
 }
 
-type MarketplaceDAO struct {
+type ReaderMarketplaceDAO struct {
 	connection *sql.DB
 }
 
-func (md MarketplaceDAO) Close() {
+func (md ReaderMarketplaceDAO) Close() {
 	md.connection.Close()
 }

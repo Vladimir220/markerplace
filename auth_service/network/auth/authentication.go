@@ -22,7 +22,7 @@ type IAuthentication interface {
 	Login(login, password string) (token string, err error)
 }
 
-func CreateAuthentication(ctx context.Context, tokenManager crypto.ITokenManager, dao postgres.IMarketplaceDAO) IAuthentication {
+func CreateAuthentication(ctx context.Context, tokenManager crypto.ITokenManager, dao postgres.IAuthMarketplaceDAO) IAuthentication {
 	return &Authentication{
 		tokenManager: tokenManager,
 		dao:          dao,
@@ -33,7 +33,7 @@ func CreateAuthentication(ctx context.Context, tokenManager crypto.ITokenManager
 
 type Authentication struct {
 	tokenManager crypto.ITokenManager
-	dao          postgres.IMarketplaceDAO
+	dao          postgres.IAuthMarketplaceDAO
 	logger       logger_lib.ILogger
 	infoLogs     bool
 }

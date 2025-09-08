@@ -54,7 +54,7 @@ func main() {
 
 	tokenManager := crypto.CreateTokenManager(ctx, tokensDaoWithLog)
 
-	dao, err := postgres.CreateMarketplaceDAO()
+	dao, err := postgres.CreateAuthMarketplaceDAO()
 	if err != nil {
 		err = fmt.Errorf("%s%v", logLabel, err)
 		logger.WriteError(err.Error())
